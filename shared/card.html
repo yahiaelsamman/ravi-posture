@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ravi</title>
+<style>
+/* Ravi's floating card for Linux: the web Ravi's nudge, a minimized pill, and a small home card.
+   Same palette, mascot and type as the web and Mac versions; fonts are bundled so it works offline. */
+@font-face{font-family:"Shrikhand";src:url(fonts/shrikhand.woff2) format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Figtree";src:url(fonts/figtree.woff2) format("woff2");font-weight:300 900;font-display:block}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-400.woff2) format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-500.woff2) format("woff2");font-weight:500;font-display:block}
+
+:root{
+  --pad:20px;
+  --bg:#E7ECE8; --surface:#FBFCFA; --sunk:#EFF3F0; --ink:#1A231F; --muted:#58665F; --line:#D0D9D3;
+  --tomato:#CF3E27; --tomato-soft:#F7DDD5; --basil:#2C774A; --basil-soft:#D5EADC;
+  --tile:#F5E8CB; --semolina:#F2C14B; --semolina-hi:#F8D97C; --crust:#C38A1E; --outline:#241F19;
+  --limb:#241F19; --chair:#A6B3AC; --meet:#7A6CF0;
+  --shadow:0 1px 2px rgba(22,34,28,.10), 0 12px 22px -12px rgba(22,34,28,.50);
+  --f-display:"Shrikhand","Georgia",serif;
+  --f-body:"Figtree","Ubuntu",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono","Ubuntu Mono",monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#101412; --surface:#191E1B; --sunk:#141815; --ink:#ECF1ED; --muted:#9AA8A0; --line:#2E3832;
+  --tomato:#FF6B4F; --tomato-soft:#3A1F18; --basil:#62C78A; --basil-soft:#17301F;
+  --tile:#2B2618; --limb:#F1E4C6; --chair:#56635C; --meet:#9C92FF;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 22px -12px rgba(0,0,0,.85);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:transparent;overflow:hidden}
+body{color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.45;-webkit-font-smoothing:antialiased;user-select:none;cursor:default}
+body.flat,body.win{--pad:0px}
+button,input{font:inherit;color:inherit}
+h3,p{margin:0}
+.shell{position:absolute;top:var(--pad);left:var(--pad)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+body.flat .card{border-radius:4px;box-shadow:none}
+body.win .card,body.win .pill{border:0;border-radius:0;box-shadow:none}
+body.win{background:var(--surface)}
+
+:focus{outline:none}
+:focus-visible,body.focused .card :focus{outline:2.5px solid var(--tomato);outline-offset:2px}
+body.focused .pill:focus{outline-offset:-3px}
+
+/* buttons (same as web) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;padding:7px 14px;font-weight:650;font-size:14px;border:1px solid var(--line);background:transparent;cursor:pointer;line-height:1.2;white-space:nowrap;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn-primary:hover{border-color:var(--ink);opacity:.9}
+.btn-good{background:var(--basil);border-color:var(--basil);color:var(--surface)}
+.btn[aria-pressed="true"]{background:var(--basil-soft);border-color:var(--basil);color:var(--ink)}
+.btn-text{border:0;padding:6px 6px;color:var(--muted);font-weight:600}
+.btn-text:hover{color:var(--ink)}
+.btn svg{width:15px;height:15px;flex:none}
+.icon-btn{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center;padding:0}
+.icon-btn:hover{background:var(--sunk);color:var(--ink)}
+.icon-btn svg{width:14px;height:14px}
+
+kbd{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:500;line-height:1.2;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--sunk);color:var(--ink)}
+.keys{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:12px;padding-top:9px;border-top:1px dashed var(--line);font-size:12px;color:var(--muted)}
+.keys span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.keys span kbd + kbd{margin-left:0}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- nudge (the web Ravi's notification, now a real window) */
+.nudge{width:416px;padding:14px;position:relative;transform-origin:top right}
+.nudge.enter{animation:nudge-in .6s cubic-bezier(.18,1.35,.4,1) both}
+@keyframes nudge-in{from{transform:translate(26px,-6px) scale(.94);opacity:0}}
+.nudge.leave{animation:nudge-out .24s ease-in both}
+@keyframes nudge-out{to{transform:translateX(26px);opacity:0}}
+.n-ctrls{position:absolute;top:8px;right:8px;display:flex;gap:2px;z-index:2}
+.n-grid{display:grid;grid-template-columns:92px minmax(0,1fr);gap:14px;align-items:start}
+.n-art{width:92px;height:100px;border-radius:14px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
+.n-art svg{width:90px;height:100px}
+.n-main{display:grid;gap:6px;min-width:0}
+.n-intro{display:grid;align-content:center;justify-items:start;min-height:100px;padding:0 60px 0 0;border:0;background:none;text-align:left;cursor:pointer;border-radius:12px}
+.n-intro small{font-size:14px;color:var(--muted);font-weight:600}
+.n-intro strong{font-family:var(--f-display);font-weight:400;font-size:38px;line-height:1.05;color:var(--tomato)}
+.n-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-right:62px}
+.n-head h3{font-size:17px;font-weight:750;line-height:1.2}
+.n-meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.n-desc{font-size:14px;color:var(--muted);line-height:1.4}
+.n-dose{font-family:var(--f-mono);font-size:13px;color:var(--tomato);font-weight:500}
+.n-actions{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px}
+.n-actions .btn{padding:7px 12px}
+.n-actions .btn-text{padding:6px 6px}
+.n-actions .spacer{flex:1}
+.howto-btn svg{width:13px;height:13px;transition:transform .2s}
+.howto-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.n-howto{margin:4px 0 0;padding:10px 12px 10px 30px;background:var(--sunk);border-radius:12px;font-size:13.5px;display:grid;gap:4px}
+.n-howto li::marker{font-family:var(--f-mono);color:var(--muted);font-size:12px}
+.n-timer{display:grid;gap:6px}
+.n-track{height:6px;border-radius:6px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
+.n-track i{display:block;height:100%;width:0;background:var(--tomato);border-radius:6px}
+.n-cue{display:flex;justify-content:space-between;align-items:baseline;font-weight:650;font-size:14.5px}
+.n-cue span:last-child{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.n-done{display:flex;align-items:center;gap:8px;font-weight:650;background:var(--basil-soft);border-radius:12px;padding:8px 12px;font-size:14.5px}
+.n-done svg{width:20px;height:20px;flex:none;color:var(--basil)}
+
+/* ---------- pill (minimized nudge) */
+.pill{display:flex;align-items:center;gap:10px;padding:5px 16px 5px 5px;border-radius:999px;text-align:left;cursor:pointer;max-width:330px;width:max-content}
+body.flat .pill{border-radius:4px}
+.p-art{width:42px;height:42px;border-radius:50%;background:var(--tile);overflow:hidden;flex:none;display:grid;place-items:center}
+.p-art svg{width:44px;height:48px;margin-top:6px}
+.p-text{display:grid;line-height:1.25;min-width:0}
+.p-text b{font-size:14px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-text small{font-size:12px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.p-dot{width:8px;height:8px;border-radius:50%;background:var(--tomato);box-shadow:0 0 0 3px var(--tomato-soft);flex:none;margin-right:2px}
+
+/* ---------- home card */
+.home{width:400px;padding:14px;position:relative}
+.h-top{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center}
+.h-art{width:76px;height:82px;border-radius:16px;background:var(--tile);overflow:hidden;display:grid;place-items:center}
+.h-art svg{width:74px;height:82px}
+.h-brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-right:30px}
+.h-brand b{font-family:var(--f-display);font-weight:400;font-size:25px;line-height:1}
+.h-x{position:absolute;top:8px;right:8px}
+.state{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:650;white-space:nowrap}
+.state i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.state[data-s="running"] i{background:var(--basil);box-shadow:0 0 0 3px var(--basil-soft)}
+.state[data-s="meeting"] i{background:var(--meet)}
+.state[data-s="due"] i{background:var(--tomato);box-shadow:0 0 0 3px var(--tomato-soft)}
+.bubble{margin-top:7px;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-weight:600;font-size:13.5px;line-height:1.3}
+.h-main{display:grid;gap:10px;margin-top:12px}
+.countdown{font-weight:800;font-size:56px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-top:2px}
+.countdown.is-now{color:var(--tomato)}
+.ruler{position:relative;height:18px}
+.ruler .ticks{position:absolute;inset:0 0 7px 0;background-image:linear-gradient(to right,var(--line) 0 1.5px,transparent 1.5px 100%);background-size:calc(100% / var(--mins,20)) 100%;background-repeat:repeat-x}
+.ruler .track{position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:6px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
+.ruler .fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--tomato);border-radius:6px;transition:width .9s linear}
+.controls{display:flex;flex-wrap:wrap;gap:6px}
+.settings{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding-top:10px;border-top:1px dashed var(--line)}
+.set-label{font-size:12.5px;color:var(--muted);font-weight:600}
+.seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--sunk)}
+.seg button{padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums;color:var(--muted);border:0;background:transparent}
+.seg button[aria-checked="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.switch input{appearance:none;-webkit-appearance:none;width:32px;height:19px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0;flex:none;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.switch input:checked{background:var(--basil)}
+.switch input:checked::after{transform:translateX(13px)}
+.h-today{display:grid;grid-template-columns:minmax(0,1fr) 168px;gap:12px;align-items:end;padding-top:10px;border-top:1px dashed var(--line)}
+.done-row{display:flex;align-items:baseline;gap:8px}
+.done-row span{font-weight:600;color:var(--muted);font-size:13.5px}
+.done-row .done-n{font-family:var(--f-display);font-weight:400;font-size:44px;line-height:.95;color:var(--ink)}
+.sub{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;align-items:end;height:62px}
+.day{display:grid;grid-template-rows:auto 1fr auto;gap:2px;height:100%;text-align:center;min-width:0}
+.day .n{font-family:var(--f-mono);font-size:10px;color:var(--muted)}
+.day .bar{align-self:end;border-radius:5px 5px 2px 2px;background:var(--tile);border:1px solid var(--line);min-height:3px}
+.day.is-today .bar{background:var(--tomato);border-color:var(--tomato)}
+.day .d{font-size:10px;font-weight:600;color:var(--muted)}
+.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:5px}
+.chips li{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--sunk);border:1px solid var(--line)}
+.chips li b{color:var(--tomato);font-family:var(--f-mono);font-weight:500;margin-left:3px}
+.chips .empty{background:none;border:0;padding:0;color:var(--muted);font-weight:500;font-size:12.5px}
+.linkish{justify-self:start;border:0;background:none;padding:2px 4px;margin-left:-4px;border-radius:8px;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.linkish:hover{color:var(--ink)}
+.linkish b{color:var(--ink);font-variant-numeric:tabular-nums}
+
+.mv-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:12px}
+.mv-head h3{font-size:15px;font-weight:750}
+.mv-list{list-style:none;margin:6px -4px 0 0;padding:0 4px 0 0;display:grid;gap:1px;max-height:372px;overflow-y:auto;scrollbar-width:thin}
+.mv-list::-webkit-scrollbar{width:8px}
+.mv-list::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.mv-list::-webkit-scrollbar-track{background:transparent}
+.mv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:4px 6px;border-radius:10px}
+.mv-row:focus-within{background:var(--sunk)}
+.mv-row.is-off .nm{color:var(--muted)}
+.mv-row .nm{font-weight:650;font-size:13.5px;line-height:1.2}
+.mv-row .ar{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.mv-row .btn-text{font-size:12.5px;padding:3px 6px}
+
+/* mascot (same drawing as the web Ravi) */
+.ravi{overflow:visible}
+.r-shadow{fill:var(--ink);opacity:.1}
+.r-body{fill:var(--semolina);stroke:var(--outline);stroke-width:3;stroke-linejoin:round}
+.r-pillow{fill:var(--semolina-hi);stroke:var(--crust);stroke-width:1.2;stroke-opacity:.55}
+.r-shine{fill:#fff;opacity:.5}
+.r-forks{fill:none;stroke:var(--crust);stroke-width:1.7;stroke-linecap:round}
+.r-limb{fill:none;stroke:var(--limb);stroke-width:4.4;stroke-linecap:round;stroke-linejoin:round}
+.r-hand,.r-shoe{fill:var(--limb)}
+.r-chair *{fill:none;stroke:var(--chair);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.f-line{fill:none;stroke:var(--outline);stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round}
+.f-fill{fill:var(--outline)}
+.f-chin{fill:none;stroke:var(--crust);stroke-width:1.8;stroke-linecap:round}
+.f-cheek{fill:var(--tomato);opacity:.28}
+.f-tongue{fill:var(--tomato)}
+
+@media (prefers-reduced-motion: reduce){
+  .nudge.enter{animation:fade-in .2s ease both}
+  .nudge.leave{animation:none}
+  @keyframes fade-in{from{opacity:0}}
+  .ruler .fill{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+
+  <!-- the nudge -->
+  <section class="card nudge" id="nudge" role="dialog" aria-labelledby="nTitle" hidden>
+    <div class="n-ctrls">
+      <button class="icon-btn" id="nMin" type="button" aria-label="Minimize" title="Minimize (M)">
+        <svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7h9"/></svg>
+      </button>
+      <button class="icon-btn" id="nClose" type="button" aria-label="Close" title="Close">
+        <svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12"/></svg>
+      </button>
+    </div>
+    <div class="n-grid">
+      <div class="n-art" id="nArt"></div>
+      <div class="n-main">
+        <button class="n-intro" id="nIntro" type="button">
+          <small>Time for a</small>
+          <strong>stretch!</strong>
+          <small>Quick one, then back to it.</small>
+        </button>
+        <div id="nCard" hidden>
+          <div class="n-main">
+            <div class="n-head"><h3 id="nTitle">Chin tucks</h3><span class="n-meta" id="nMeta"></span></div>
+            <p class="n-desc" id="nDesc"></p>
+            <p class="n-dose" id="nDose"></p>
+            <div class="n-actions" id="nDue">
+              <button class="btn btn-primary" id="nStart" type="button">Start</button>
+              <button class="btn" id="nSnooze" type="button" title="Ask again in 5 minutes">Snooze</button>
+              <button class="btn btn-text" id="nSkip" type="button">Skip</button>
+              <span class="spacer"></span>
+              <button class="btn btn-text howto-btn" id="nHowBtn" type="button" aria-expanded="false" aria-controls="nHow">How to
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg>
+              </button>
+            </div>
+            <div class="n-timer" id="nTimer" hidden>
+              <div class="n-cue"><span id="nCue">Rep 1 of 10</span><span id="nLeft">0:45</span></div>
+              <div class="n-track"><i id="nBar"></i></div>
+              <div class="n-actions">
+                <button class="btn btn-good" id="nDone" type="button">Done</button>
+                <button class="btn" id="nStop" type="button">Stop</button>
+              </div>
+            </div>
+            <div class="n-done" id="nFinished" hidden>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="10" fill="currentColor"/><path d="M5.5 10.3l3 3 6-6.4" fill="none" stroke="var(--surface)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="nDoneText">Nice!</span>
+            </div>
+            <ol class="n-howto" id="nHow" hidden></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="keys" id="nKeys"></div>
+  </section>
+
+  <!-- minimized -->
+  <button class="card pill" id="pill" type="button" hidden>
+    <span class="p-art" id="pArt"></span>
+    <span class="p-text"><b id="pTitle">Chin tucks</b><small id="pSub"></small></span>
+  </button>
+
+  <!-- home -->
+  <section class="card home" id="home" aria-label="Ravi" hidden>
+    <button class="icon-btn h-x" id="hClose" type="button" aria-label="Hide" title="Hide (Esc)">
+      <svg viewBox="0 0 14 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12"/></svg>
+    </button>
+    <div class="h-top">
+      <div class="h-art" id="hArt"></div>
+      <div>
+        <div class="h-brand"><b>Ravi</b><span class="state" id="hState" data-s="off"><i></i><span id="hStateText">Not started</span></span></div>
+        <p class="bubble" id="hBubble" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="h-main" id="hMain">
+      <div>
+        <p class="eyebrow" id="hLabel">Next stretch in</p>
+        <div class="countdown" id="hCount">20:00</div>
+      </div>
+      <div class="ruler" aria-hidden="true"><div class="ticks" id="hTicks"></div><div class="track"><div class="fill" id="hFill"></div></div></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="hRun" type="button">Pause</button>
+        <button class="btn" id="hMeet" type="button" aria-pressed="false">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="1.5" y="4" width="9" height="8" rx="2"/><path d="M10.5 7l4-2.2v6.4l-4-2.2"/></svg>
+          In a meeting</button>
+        <button class="btn" id="hNow" type="button">Stretch now</button>
+      </div>
+      <div class="settings">
+        <span class="set-label" id="everyLbl">Every</span>
+        <div class="seg" role="radiogroup" aria-labelledby="everyLbl" id="hSeg"></div>
+        <label class="switch"><input type="checkbox" role="switch" id="hSound"> Chime</label>
+      </div>
+      <div class="h-today">
+        <div>
+          <div class="done-row"><span class="done-n" id="hDone">0</span><span id="hDoneWord">stretches today</span></div>
+          <p class="sub" id="hSub">0 snoozed · 0 skipped</p>
+        </div>
+        <div class="week" id="hWeek" aria-label="Last 7 days"></div>
+      </div>
+      <ul class="chips" id="hChips"></ul>
+      <button class="linkish" id="hMovesBtn" type="button">Moves in rotation <b id="hOn">12/12</b></button>
+    </div>
+
+    <div id="hMoves" hidden>
+      <div class="mv-head"><h3>Moves in rotation</h3><span class="sub">Ravi picks from the ones switched on</span></div>
+      <ul class="mv-list" id="mvList"></ul>
+    </div>
+    <div class="keys" id="hKeys"></div>
+  </section>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+// One bridge for every shell: WebKit on Linux and macOS, WebView2 on Windows.
+const post = (t, d) => {
+  const m = JSON.stringify(Object.assign({ t }, d || {}));
+  try {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.ravi) window.webkit.messageHandlers.ravi.postMessage(m);
+    else if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage(m);
+    else console.log("[ravi → host]", m);
+  } catch (e) { console.log("[ravi → host]", m); }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+/* ---------- mascot drawing (same as the web Ravi) ---------- */
+function squircle(a, n, scallop){
+  const pts = [], N = 300;
+  for (let i = 0; i < N; i++){
+    const t = i / N * Math.PI * 2, c = Math.cos(t), s = Math.sin(t);
+    let x = a * Math.sign(c) * Math.pow(Math.abs(c), 2/n), y = a * Math.sign(s) * Math.pow(Math.abs(s), 2/n);
+    if (scallop){ const f = 1 + scallop.amp * (0.5 + 0.5 * Math.cos(scallop.k * t)); x *= f; y *= f; }
+    pts.push([90 + x, 84 + y]);
+  }
+  return "M" + pts.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join("L") + "Z";
+}
+const BODY = squircle(42.5, 4.2, { amp:0.03, k:24 });
+const PILLOW = squircle(29, 3.2);
+const FORKS = (() => {
+  let d = "";
+  for (let j = 0; j < 24; j++){
+    const t = (2*j + 1) * Math.PI / 24, c = Math.cos(t), s = Math.sin(t);
+    const bx = 42 * Math.sign(c) * Math.pow(Math.abs(c), 2/4.2), by = 42 * Math.sign(s) * Math.pow(Math.abs(s), 2/4.2);
+    d += `M${(90 + bx*.83).toFixed(1)} ${(84 + by*.83).toFixed(1)}L${(90 + bx*.92).toFixed(1)} ${(84 + by*.92).toFixed(1)}`;
+  }
+  return d;
+})();
+const EYES_OPEN = `<circle cx="77" cy="80" r="4.3" class="f-fill"/><circle cx="78.4" cy="78.5" r="1.3" fill="#fff"/><circle cx="103" cy="80" r="4.3" class="f-fill"/><circle cx="104.4" cy="78.5" r="1.3" fill="#fff"/>`;
+const EYES_SHUT = `<path class="f-line" d="M73 80.5 Q77 83 81 80.5 M99 80.5 Q103 83 107 80.5"/>`;
+const EYES_CALM = `<path class="f-line" d="M73 81 Q77 77 81 81 M99 81 Q103 77 107 81"/>`;
+const FACES = {
+  smile:{ eyes:EYES_OPEN, mouth:`<path class="f-line" d="M83 93 Q90 100.5 97 93"/>`, blink:true },
+  grin:{ eyes:EYES_OPEN, mouth:`<path class="f-fill" d="M81 92 Q90 107 99 92 Z"/><path class="f-tongue" d="M85.2 99.2 Q90 104.6 94.8 99.2 Q90 100.8 85.2 99.2 Z"/>`, blink:true },
+  neutral:{ eyes:EYES_OPEN, mouth:`<path class="f-line" d="M85 96 L95 96"/>`, blink:true },
+  tuck:{ eyes:EYES_OPEN, mouth:`<path class="f-line" d="M86 94.5 L94 94.5"/><path class="f-chin" d="M82.5 100.5 Q90 104.5 97.5 100.5"/>` },
+  effort:{ eyes:`<path class="f-line" d="M73 77 L79.5 80 L73 83 M107 77 L100.5 80 L107 83"/>`, mouth:`<path class="f-line" d="M84 96.5 Q90 93.5 96 96.5"/>` },
+  calm:{ eyes:EYES_CALM, mouth:`<path class="f-line" d="M85 94 Q90 98.5 95 94"/>` },
+  unimpressed:{ eyes:`<path class="f-fill" d="M72.7 79 A4.3 4.3 0 0 0 81.3 79 Z M98.7 79 A4.3 4.3 0 0 0 107.3 79 Z"/><path class="f-line" d="M71.5 79 L82.5 79 M97.5 79 L108.5 79 M71.5 72 L82.5 71 M97.5 71 L108.5 72"/>`, mouth:`<path class="f-line" d="M84 96.5 L96 95"/>` },
+  shh:{ eyes:EYES_CALM, mouth:`<circle cx="90" cy="96" r="2.8" class="f-fill"/>` },
+};
+const BASE = { armL:[[38,110],[34,128]], armR:[[142,110],[146,128]], legL:[[70,152],[68,177]], legR:[[110,152],[112,177]], dx:0, dy:0, rot:0, sx:1, sy:1, ex:0, ey:0 };
+const SEAT = { legL:[[58,146],[60,178]], legR:[[122,146],[120,178]] };
+const HIPS = { armL:[[30,108],[50,122]], armR:[[150,108],[130,122]] };
+const POSES = {
+  idle:   { p:3.2, A:{}, B:{ dy:-1.6, sy:1.012 }, face:"smile" },
+  wave:   { p:0.9, A:{ armR:[[152,78],[160,52]] }, B:{ armR:[[152,78],[171,60]] }, face:"grin" },
+  cheer:  { p:0.75, A:{ armL:[[36,72],[28,48]], armR:[[144,72],[152,48]] }, B:{ armL:[[33,67],[21,42]], armR:[[147,67],[159,42]], dy:-7, legL:[[70,146],[68,170]], legR:[[110,146],[112,170]] }, face:"grin" },
+  crossed:{ p:3.5, A:{ armL:[[44,112],[112,110]], armR:[[136,108],[68,106]] }, B:{ dy:-1 }, face:"unimpressed" },
+  shh:    { p:3.4, A:{ armR:[[136,114],[97,99]] }, B:{ dy:-1 }, face:"shh" },
+  tuck:   { p:3.0, A:{ ...HIPS }, B:{ sy:.95, dy:1.5 }, face:"neutral", faceB:"tuck" },
+  arch:   { p:3.2, chair:true, A:{ ...SEAT, armL:[[28,62],[58,40]], armR:[[152,62],[122,40]] }, B:{ sy:.95, dy:-2, ey:-3, armL:[[25,57],[58,36]], armR:[[155,57],[122,36]] }, face:"smile", faceB:"effort" },
+  walk:   { p:0.72, A:{ dy:-2, armL:[[44,108],[50,124]], armR:[[138,110],[134,128]], legL:[[72,142],[71,165]] }, B:{ dy:-2, armL:[[37,110],[31,126]], armR:[[136,108],[130,124]], legR:[[108,142],[109,165]] }, face:"smile" },
+  squeeze:{ p:2.6, A:{ armL:[[26,92],[26,66]], armR:[[154,92],[154,66]] }, B:{ armL:[[36,100],[34,74]], armR:[[144,100],[146,74]], sx:.97 }, face:"smile", faceB:"effort" },
+  doorway:{ p:3.0, A:{ armL:[[24,86],[20,58]], armR:[[156,86],[160,58]] }, B:{ armL:[[21,84],[15,58]], armR:[[159,84],[165,58]], sx:1.04, sy:1.04, dy:2 }, face:"calm" },
+  tilt:   { p:3.4, A:{ rot:-10, armR:[[146,66],[124,42]] }, B:{ rot:-4, armR:[[148,70],[128,44]] }, face:"calm" },
+  reach:  { p:3.0, A:{ armL:[[44,62],[50,28]], armR:[[136,62],[130,28]], dy:-3, sy:1.04 }, B:{ rot:-8 }, face:"smile" },
+  twist:  { p:3.2, chair:true, A:{ ...SEAT, armL:[[60,112],[116,106]], armR:[[150,100],[146,80]], ex:5, rot:3 }, B:{ armL:[[30,100],[34,80]], armR:[[120,112],[64,106]], ex:-5, rot:-3 }, face:"smile" },
+  wrist:  { p:2.4, A:{ armL:HIPS.armL, armR:[[158,92],[177,84]], ex:4 }, B:{ armR:[[158,92],[177,100]] }, face:"neutral" },
+  gaze:   { p:4.0, A:{ armR:[[146,82],[113,67]], ex:-3, ey:-1 }, B:{ ex:3 }, face:"smile" },
+  lunge:  { p:3.0, A:{ ...HIPS, dy:4, legL:[[62,146],[52,177]], legR:[[114,152],[128,178]] }, B:{ dy:8, legL:[[59,150],[49,177]], legR:[[117,156],[131,178]] }, face:"smile", faceB:"effort" },
+  calf:   { p:1.6, A:{ ...HIPS }, B:{ dy:-8, legL:[[70,146],[69,170]], legR:[[110,146],[111,170]] }, face:"smile" },
+};
+for (const P of Object.values(POSES)){ P._A = { ...BASE, ...P.A }; P._B = { ...P._A, ...P.B }; }
+const lerp = (a, b, k) => a + (b - a) * k;
+const lerpPt = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k)];
+const pts = (...ps) => ps.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+const RAVI_SVG = `
+<ellipse class="r-shadow" cx="90" cy="186" rx="44" ry="5"/>
+<g class="r-chair" style="display:none"><path d="M56 26 H124 M58 26 V44 M122 26 V44"/><path d="M38 128 H142"/><path d="M46 129 L43 190 M134 129 L137 190"/></g>
+<g class="r-legs"><polyline class="r-limb" data-k="legL"/><polyline class="r-limb" data-k="legR"/><ellipse class="r-shoe" data-k="shoeL" rx="7.5" ry="4.2"/><ellipse class="r-shoe" data-k="shoeR" rx="7.5" ry="4.2"/></g>
+<g class="r-upper">
+  <path class="r-body" d="${BODY}"/>
+  <path class="r-pillow" d="${PILLOW}"/>
+  <ellipse class="r-shine" cx="73" cy="63" rx="11" ry="6" transform="rotate(-28 73 63)"/>
+  <path class="r-forks" d="${FORKS}"/>
+  <g class="r-face"><circle class="f-cheek" cx="66.5" cy="91" r="5.2"/><circle class="f-cheek" cx="113.5" cy="91" r="5.2"/><g class="r-eyes"></g><g class="r-mouth"></g></g>
+  <polyline class="r-limb" data-k="armL"/><polyline class="r-limb" data-k="armR"/>
+  <circle class="r-hand" data-k="handL" r="4.3"/><circle class="r-hand" data-k="handR" r="4.3"/>
+</g>`;
+const live = new Set();
+function makeRavi(host, pose = "idle"){
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  host.appendChild(svg);
+  svg.setAttribute("viewBox", "0 0 180 200");
+  svg.setAttribute("class", "ravi");
+  svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = RAVI_SVG;
+  const q = k => svg.querySelector(`[data-k="${k}"]`);
+  return { svg, pose, t0:performance.now(), seed:Math.random()*4000, faceKey:"", eyeKey:"",
+    upper:svg.querySelector(".r-upper"), chair:svg.querySelector(".r-chair"), eyes:svg.querySelector(".r-eyes"), mouth:svg.querySelector(".r-mouth"),
+    armL:q("armL"), armR:q("armR"), legL:q("legL"), legR:q("legR"), handL:q("handL"), handR:q("handR"), shoeL:q("shoeL"), shoeR:q("shoeR") };
+}
+function setPose(inst, pose, { animate = true } = {}){
+  if (!POSES[pose]) pose = "idle";
+  if (inst.pose !== pose){ inst.pose = pose; inst.t0 = performance.now(); }
+  if (animate) live.add(inst); else live.delete(inst);
+  drawRavi(inst, performance.now(), animate ? null : 0.85);
+}
+function drawRavi(inst, now, fixedK){
+  const P = POSES[inst.pose];
+  const k = fixedK != null ? fixedK : (reduced.matches ? 0 : 0.5 - 0.5 * Math.cos(2 * Math.PI * ((now - inst.t0) / (P.p * 1000))));
+  const A = P._A, B = P._B;
+  const dx = lerp(A.dx, B.dx, k), dy = lerp(A.dy, B.dy, k), rot = lerp(A.rot, B.rot, k), sx = lerp(A.sx, B.sx, k), sy = lerp(A.sy, B.sy, k);
+  inst.upper.setAttribute("transform", `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) rotate(${rot.toFixed(2)} 90 128) translate(90 128) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(-90 -128)`);
+  const eL = lerpPt(A.armL[0], B.armL[0], k), hL = lerpPt(A.armL[1], B.armL[1], k);
+  const eR = lerpPt(A.armR[0], B.armR[0], k), hR = lerpPt(A.armR[1], B.armR[1], k);
+  inst.armL.setAttribute("points", pts([50,92], eL, hL));
+  inst.armR.setAttribute("points", pts([130,92], eR, hR));
+  inst.handL.setAttribute("cx", hL[0].toFixed(1)); inst.handL.setAttribute("cy", hL[1].toFixed(1));
+  inst.handR.setAttribute("cx", hR[0].toFixed(1)); inst.handR.setAttribute("cy", hR[1].toFixed(1));
+  const kL = lerpPt(A.legL[0], B.legL[0], k), fL = lerpPt(A.legL[1], B.legL[1], k);
+  const kR = lerpPt(A.legR[0], B.legR[0], k), fR = lerpPt(A.legR[1], B.legR[1], k);
+  inst.legL.setAttribute("points", pts([72 + dx, 126 + dy], kL, fL));
+  inst.legR.setAttribute("points", pts([108 + dx, 126 + dy], kR, fR));
+  inst.shoeL.setAttribute("cx", (fL[0] - 3).toFixed(1)); inst.shoeL.setAttribute("cy", (fL[1] + 1.5).toFixed(1));
+  inst.shoeR.setAttribute("cx", (fR[0] + 3).toFixed(1)); inst.shoeR.setAttribute("cy", (fR[1] + 1.5).toFixed(1));
+  inst.chair.style.display = P.chair ? "" : "none";
+  const faceName = (P.faceB && k > 0.5) ? P.faceB : P.face;
+  const F = FACES[faceName];
+  const blinking = F.blink && fixedK == null && !reduced.matches && ((now + inst.seed) % 4300) < 140;
+  const fk = faceName + (blinking ? "-b" : "");
+  if (fk !== inst.faceKey){ inst.faceKey = fk; inst.eyes.innerHTML = blinking ? EYES_SHUT : F.eyes; inst.mouth.innerHTML = F.mouth; }
+  const ek = lerp(A.ex, B.ex, k).toFixed(1) + "," + lerp(A.ey, B.ey, k).toFixed(1);
+  if (ek !== inst.eyeKey){ inst.eyeKey = ek; inst.eyes.setAttribute("transform", `translate(${ek.replace(","," ")})`); }
+}
+(function frame(now){
+  for (const inst of live) drawRavi(inst, now);
+  requestAnimationFrame(frame);
+})(performance.now());
+
+/* ---------- chime (same notes as the web Ravi) ---------- */
+let actx = null;
+function chime(kind, force){
+  if (S.nativeChime) return;           // macOS plays its own system sounds
+  if (!S.sound && !force) return;
+  try{
+    if (!actx){ const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; actx = new AC(); }
+    if (actx.state === "suspended") actx.resume().catch(() => {});
+    const notes = kind === "done" ? [784, 988, 1319] : kind === "test" ? [659, 880] : [523, 659, 880];
+    const t0 = actx.currentTime + 0.03;
+    notes.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = "triangle"; o.frequency.value = f;
+      const t = t0 + i * 0.13;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.22, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+      o.connect(g).connect(actx.destination);
+      o.start(t); o.stop(t + 0.6);
+    });
+  }catch(e){}
+}
+
+/* ---------- elements & state ---------- */
+const els = {
+  nudge:$("nudge"), nArt:$("nArt"), nIntro:$("nIntro"), nCard:$("nCard"), nTitle:$("nTitle"), nMeta:$("nMeta"), nDesc:$("nDesc"), nDose:$("nDose"),
+  nDue:$("nDue"), nStart:$("nStart"), nSnooze:$("nSnooze"), nSkip:$("nSkip"), nHowBtn:$("nHowBtn"), nHow:$("nHow"),
+  nTimer:$("nTimer"), nCue:$("nCue"), nLeft:$("nLeft"), nBar:$("nBar"), nDone:$("nDone"), nStop:$("nStop"),
+  nFinished:$("nFinished"), nDoneText:$("nDoneText"), nClose:$("nClose"), nMin:$("nMin"), nKeys:$("nKeys"),
+  pill:$("pill"), pTitle:$("pTitle"), pSub:$("pSub"),
+  home:$("home"), hState:$("hState"), hStateText:$("hStateText"), hBubble:$("hBubble"), hLabel:$("hLabel"), hCount:$("hCount"),
+  hTicks:$("hTicks"), hFill:$("hFill"), hRun:$("hRun"), hMeet:$("hMeet"), hNow:$("hNow"), hSeg:$("hSeg"), hSound:$("hSound"),
+  hDone:$("hDone"), hDoneWord:$("hDoneWord"), hSub:$("hSub"), hWeek:$("hWeek"), hChips:$("hChips"), hOn:$("hOn"),
+  hMovesBtn:$("hMovesBtn"), hMain:$("hMain"), hMoves:$("hMoves"), mvList:$("mvList"), hKeys:$("hKeys"), hClose:$("hClose")
+};
+const S = { mode:"none", focused:false, sound:false, view:"main", lastSize:"", homeKeys:{}, movesBuilt:false, home:null };
+const N = { key:null, move:null, manual:false, phase:null, startedAt:0, timers:[], tick:null, total:0, leaving:false };
+
+const cardRavi = makeRavi(els.nArt, "wave");
+const pillRavi = makeRavi($("pArt"), "idle");
+const homeRavi = makeRavi($("hArt"), "wave");
+
+const INTERVALS = [15, 20, 30, 45, 60];
+INTERVALS.forEach((m, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.setAttribute("role", "radio"); b.dataset.m = m; b.textContent = m + " min";
+  b.title = `Every ${m} minutes (${i + 1})`;
+  b.addEventListener("click", () => post("interval", { m }));
+  els.hSeg.appendChild(b);
+});
+
+/* ---------- nudge ---------- */
+function clearTimers(){ N.timers.forEach(clearTimeout); N.timers = []; }
+function stopTick(){ if (N.tick){ clearInterval(N.tick); N.tick = null; } }
+
+function openNudge(n){
+  clearTimers(); stopTick();
+  Object.assign(N, { key:n.key, move:n.move, manual:n.manual, total:n.total, leaving:false });
+  const m = n.move;
+  els.nTitle.textContent = m.name;
+  els.nDesc.textContent = m.desc;
+  els.nDose.textContent = m.dose;
+  els.nMeta.textContent = (n.doneToday ? `${n.doneToday} today · ` : "") + n.time;
+  els.nHow.innerHTML = m.steps.map(s => `<li>${esc(s)}</li>`).join("");
+  els.nHow.hidden = true; els.nHowBtn.setAttribute("aria-expanded", "false");
+  els.pTitle.textContent = m.name;
+  els.nudge.classList.remove("leave", "enter"); void els.nudge.offsetWidth; els.nudge.classList.add("enter");
+  setPhase(n.intro ? "intro" : "due");
+  if (n.intro){
+    N.timers.push(setTimeout(() => { if (N.phase === "intro") setPhase("due"); }, 2600));
+    chime("nudge");
+  }
+}
+function setPhase(phase){
+  N.phase = phase;
+  els.nIntro.hidden = phase !== "intro";
+  els.nCard.hidden = phase === "intro";
+  els.nDue.hidden = phase !== "due";
+  els.nTimer.hidden = phase !== "active";
+  els.nFinished.hidden = phase !== "done";
+  els.nDesc.hidden = els.nDose.hidden = phase === "done";
+  if (phase === "done") els.nHow.hidden = true;
+  setPose(cardRavi, phase === "intro" ? "wave" : phase === "done" ? "cheer" : N.move.pose, { animate:S.mode === "nudge" });
+  if (phase === "active"){ N.startedAt = Date.now(); updateActive(); N.tick = setInterval(updateActive, 250); }
+  else stopTick();
+  post("phase", { phase, key:N.key });
+  renderPill(); renderKeys(); measure();
+  if (S.focused) focusDefault();
+}
+function cue(m, elapsed){
+  if (m.reps){ const per = m.secs / m.reps; return `Rep ${Math.min(m.reps, Math.floor(elapsed / per) + 1)} of ${m.reps}`; }
+  if (m.sides) return elapsed < m.secs / 2 ? "First side" : "Switch sides";
+  return m.id === "walk" ? "Keep walking" : "Hold it";
+}
+function updateActive(){
+  const m = N.move; if (!m || N.phase !== "active") return;
+  const total = m.secs * 1000, elapsed = Math.min(total, Date.now() - N.startedAt);
+  const left = Math.max(0, Math.ceil((total - elapsed) / 1000));
+  els.nCue.textContent = cue(m, elapsed / 1000);
+  els.nLeft.textContent = `${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;
+  els.nBar.style.width = (elapsed / total * 100).toFixed(1) + "%";
+  if (S.mode === "pill") renderPill();
+  if (elapsed >= total) finish();
+}
+function finish(){
+  if (!N.key || N.phase === "done" || N.phase === "intro") return;
+  els.nDoneText.textContent = `Nice! That's ${N.total + 1} today.`;
+  setPhase("done");
+  chime("done");
+  post("finish");
+  N.timers.push(setTimeout(() => leave("closed"), 4500));
+}
+function leave(t, data){
+  if (N.leaving || !N.key) return;
+  N.leaving = true; clearTimers(); stopTick();
+  if (reduced.matches || S.mode !== "nudge"){ post(t, data); return; }
+  els.nudge.classList.remove("enter"); els.nudge.classList.add("leave");
+  setTimeout(() => post(t, data), 230);
+}
+function toggleHow(){
+  const open = els.nHow.hidden;
+  els.nHow.hidden = !open; els.nHowBtn.setAttribute("aria-expanded", String(open));
+  measure();
+}
+function renderPill(){
+  if (!N.move) return;
+  const dot = '<span class="p-dot"></span>';
+  if (N.phase === "active") els.pSub.innerHTML = `${dot}${esc(els.nCue.textContent)} · ${esc(els.nLeft.textContent)} left`;
+  else if (N.phase === "done") els.pSub.innerHTML = "Done. Bellissimo.";
+  else els.pSub.innerHTML = S.focused ? `${dot}Waiting · <kbd>Enter</kbd> to open` : `${dot}Waiting · ${GRAB_KEYS.map(k => `<kbd>${k}</kbd>`).join("")}`;
+}
+
+els.nIntro.addEventListener("click", () => setPhase("due"));
+els.nStart.addEventListener("click", () => setPhase("active"));
+els.nDone.addEventListener("click", finish);
+els.nStop.addEventListener("click", () => leave("skip", { how:"stop" }));
+els.nSnooze.addEventListener("click", () => leave("snooze"));
+els.nSkip.addEventListener("click", () => leave("skip", { how:"skip" }));
+els.nClose.addEventListener("click", () => N.phase === "done" ? leave("closed") : leave("skip", { how:"close" }));
+els.nMin.addEventListener("click", () => post("minimize"));
+els.nHowBtn.addEventListener("click", toggleHow);
+els.pill.addEventListener("click", () => post("restore"));
+
+/* ---------- home ---------- */
+els.hRun.addEventListener("click", () => post("toggleRun"));
+els.hMeet.addEventListener("click", () => post("meeting"));
+els.hNow.addEventListener("click", () => post("stretchNow"));
+els.hClose.addEventListener("click", () => post("hide"));
+els.hSound.addEventListener("change", () => { post("sound", { on:els.hSound.checked }); if (els.hSound.checked) chime("test", true); });
+els.hMovesBtn.addEventListener("click", () => showView("moves"));
+
+function showView(v){
+  S.view = v;
+  els.hMain.hidden = v !== "main";
+  els.hMoves.hidden = v !== "moves";
+  renderKeys(); measure();
+  if (S.focused){
+    if (v === "moves"){ const f = els.mvList.querySelector("input"); if (f) f.focus(); }
+    else els.hMovesBtn.focus();
+  }
+}
+function buildMoves(moves){
+  els.mvList.innerHTML = "";
+  for (const m of moves){
+    const li = document.createElement("li");
+    li.className = "mv-row"; li.dataset.id = m.id;
+    li.innerHTML = `<label class="switch"><input type="checkbox" role="switch" aria-label="${esc(m.name)} in rotation"></label>
+      <div><span class="nm">${esc(m.name)}</span><span class="ar">${esc(m.area)} · ${esc(m.dose)}</span></div>
+      <button class="btn btn-text" type="button">Try now</button>`;
+    li.querySelector("input").addEventListener("change", e => { li.classList.toggle("is-off", !e.target.checked); post("moveOn", { id:m.id, on:e.target.checked }); });
+    li.querySelector("button").addEventListener("click", () => post("try", { id:m.id }));
+    els.mvList.appendChild(li);
+  }
+  S.movesBuilt = true;
+}
+function setOnce(key, val, fn){ if (S.homeKeys[key] !== val){ S.homeKeys[key] = val; fn(val); } }
+function renderHome(h){
+  S.home = h;
+  setOnce("state", h.status, v => els.hState.dataset.s = v);
+  setOnce("stateText", h.statusText, v => els.hStateText.textContent = v);
+  setOnce("bubble", h.bubble, v => els.hBubble.textContent = v);
+  setOnce("label", h.label, v => els.hLabel.textContent = v);
+  setOnce("count", h.countdown, v => els.hCount.textContent = v);
+  els.hCount.classList.toggle("is-now", h.isNow);
+  els.hFill.style.width = (h.frac * 100).toFixed(2) + "%";
+  els.hTicks.style.setProperty("--mins", h.interval);
+  setOnce("run", h.mainLabel, v => els.hRun.textContent = v);
+  els.hRun.classList.toggle("btn-primary", !h.running);
+  els.hMeet.setAttribute("aria-pressed", String(!!h.meeting));
+  for (const b of els.hSeg.children) b.setAttribute("aria-checked", String(Number(b.dataset.m) === h.interval));
+  els.hSound.checked = !!h.sound;
+  els.hDone.textContent = h.today.done;
+  els.hDoneWord.textContent = h.today.done === 1 ? "stretch today" : "stretches today";
+  els.hSub.textContent = `${h.today.snoozed} snoozed · ${h.today.skipped} skipped`;
+  setOnce("chips", JSON.stringify([h.today.chips, h.running]), () => {
+    els.hChips.innerHTML = h.today.chips.length
+      ? h.today.chips.map(([n, c]) => `<li>${esc(n)}<b>×${c}</b></li>`).join("")
+      : `<li class="empty">${h.running ? "Nothing yet. Your first nudge is on its way." : "Press Start and Ravi will check in."}</li>`;
+  });
+  setOnce("week", JSON.stringify(h.week), () => {
+    const max = Math.max(6, ...h.week.map(d => d.v));
+    els.hWeek.innerHTML = h.week.map(d => {
+      const ht = d.v ? Math.max(6, d.v / max * 100) : 4;
+      return `<div class="day${d.today ? " is-today" : ""}" title="${esc(d.title)}: ${d.v} done"><span class="n">${d.v}</span><div class="bar" style="height:${ht.toFixed(0)}%"></div><span class="d">${esc(d.d)}</span></div>`;
+    }).join("");
+  });
+  if (!S.movesBuilt) buildMoves(h.moves);
+  let on = 0;
+  for (const m of h.moves){
+    if (m.on) on++;
+    const li = els.mvList.querySelector(`[data-id="${m.id}"]`);
+    if (li){ const inp = li.querySelector("input"); if (inp.checked !== m.on) inp.checked = m.on; li.classList.toggle("is-off", !m.on); }
+  }
+  els.hOn.textContent = `${on}/${h.moves.length}`;
+  if (homeRavi.pose !== h.pose || !live.has(homeRavi)) setPose(homeRavi, h.pose, { animate:S.mode === "home" });
+}
+
+/* ---------- key hints ---------- */
+const K = (keys, label) => `<span>${keys.map(k => `<kbd>${k}</kbd>`).join("")}&nbsp;${label}</span>`;
+let GRAB = K(["Ctrl","Alt","R"], "to use the keyboard");
+let GRAB_KEYS = ["Ctrl","Alt","R"];
+function renderKeys(){
+  if (!S.focused){ els.nKeys.innerHTML = GRAB; els.hKeys.innerHTML = GRAB; return; }
+  const p = N.phase;
+  els.nKeys.innerHTML =
+    p === "intro" ? K(["Enter"], "show me") + K(["M"], "later") :
+    p === "due" ? K(["Enter"], "start") + K(["S"], "snooze") + K(["X"], "skip") + K(["H"], "how to") + K(["M"], "minimize") :
+    p === "active" ? K(["Enter"], "done") + K(["X"], "stop") + K(["M"], "minimize") :
+    K(["Enter"], "close");
+  els.hKeys.innerHTML = S.view === "moves"
+    ? K(["↑","↓"], "move") + K(["Space"], "on/off") + K(["T"], "try") + K(["Esc"], "back")
+    : K(["P"], "pause") + K(["M"], "meeting") + K(["N"], "stretch now") + K(["1–5"], "interval") + K(["C"], "chime") + K(["V"], "moves") + K(["Esc"], "hide");
+}
+
+/* ---------- focus & keyboard ---------- */
+function focusDefault(){
+  if (S.mode === "nudge"){
+    const t = N.phase === "intro" ? els.nIntro : N.phase === "due" ? els.nStart : N.phase === "active" ? els.nDone : els.nClose;
+    t.focus({ preventScroll:true });
+  } else if (S.mode === "pill") els.pill.focus({ preventScroll:true });
+  else if (S.mode === "home"){
+    if (S.view === "moves"){ const f = els.mvList.querySelector("input"); if (f && !els.mvList.contains(document.activeElement)) f.focus(); }
+    else if (!els.hMain.contains(document.activeElement)) els.hRun.focus({ preventScroll:true });
+  }
+}
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  const a = document.activeElement;
+  const onControl = a && (a.tagName === "BUTTON" || a.tagName === "INPUT");
+  const take = fn => { e.preventDefault(); fn(); };
+
+  if (S.mode === "nudge"){
+    if (k === "Escape" || k === "m"){ if (N.phase === "done") take(() => leave("closed")); else take(() => post("minimize")); return; }
+    if (N.phase === "intro"){ if (k === "Enter" || k === " ") take(() => setPhase("due")); return; }
+    if (N.phase === "due"){
+      if (k === "Enter" && !onControl) take(() => setPhase("active"));
+      else if (k === "s") take(() => leave("snooze"));
+      else if (k === "x") take(() => leave("skip", { how:"skip" }));
+      else if (k === "h") take(toggleHow);
+      return;
+    }
+    if (N.phase === "active"){
+      if ((k === "Enter" && !onControl) || k === "d") take(finish);
+      else if (k === "x") take(() => leave("skip", { how:"stop" }));
+      return;
+    }
+    if (N.phase === "done" && (k === "Enter" || k === " ")) take(() => leave("closed"));
+    return;
+  }
+  if (S.mode === "pill"){
+    if (k === "Escape") take(() => post("unfocus"));
+    else if (k === "Enter" && !onControl) take(() => post("restore"));
+    return;
+  }
+  if (S.mode === "home"){
+    if (S.view === "moves"){
+      const rows = [...els.mvList.querySelectorAll(".mv-row")];
+      const i = rows.findIndex(r => r.contains(a));
+      if (k === "Escape" || k === "v") take(() => showView("main"));
+      else if (k === "ArrowDown" || k === "j") take(() => rows[Math.min(rows.length - 1, i + 1)].querySelector("input").focus());
+      else if (k === "ArrowUp" || k === "k") take(() => rows[Math.max(0, i - 1)].querySelector("input").focus());
+      else if (k === "t" && i >= 0) take(() => post("try", { id:rows[i].dataset.id }));
+      return;
+    }
+    if (k === "Escape") take(() => post("hide"));
+    else if (k === "p") take(() => post("toggleRun"));
+    else if (k === "m") take(() => post("meeting"));
+    else if (k === "n") take(() => post("stretchNow"));
+    else if (k === "c") take(() => els.hSound.click());
+    else if (k === "v") take(() => showView("moves"));
+    else if (/^[1-5]$/.test(k)) take(() => post("interval", { m:INTERVALS[Number(k) - 1] }));
+  }
+});
+
+/* ---------- size: the host window hugs the visible card ---------- */
+function measure(){
+  const el = S.mode === "nudge" ? els.nudge : S.mode === "pill" ? els.pill : S.mode === "home" ? els.home : null;
+  if (!el) return;
+  // layout size, not getBoundingClientRect: the slide-in animation scales the card
+  const pad = parseFloat(getComputedStyle(document.body).getPropertyValue("--pad")) || 0;
+  const w = Math.ceil(el.offsetWidth + 2 * pad), h = Math.ceil(el.offsetHeight + 2 * pad);
+  const key = `${S.mode}:${w}x${h}`;
+  if (key === S.lastSize) return;
+  S.lastSize = key;
+  post("size", { w, h, mode:S.mode });
+}
+const ro = new ResizeObserver(measure);
+[els.nudge, els.pill, els.home].forEach(el => ro.observe(el));
+document.fonts && document.fonts.ready.then(measure);
+
+/* ---------- host -> page ---------- */
+function setMode(mode){
+  if (mode === S.mode) return;
+  const prev = S.mode;
+  S.mode = mode;
+  els.nudge.hidden = mode !== "nudge";
+  els.pill.hidden = mode !== "pill";
+  els.home.hidden = mode !== "home";
+  live.clear();
+  if (mode === "nudge"){
+    setPose(cardRavi, N.phase === "intro" ? "wave" : N.phase === "done" ? "cheer" : (N.move ? N.move.pose : "wave"), { animate:true });
+    if (prev === "pill"){ els.nudge.classList.remove("leave", "enter"); void els.nudge.offsetWidth; els.nudge.classList.add("enter"); }
+  }
+  if (mode === "pill") setPose(pillRavi, N.phase === "active" && N.move ? N.move.pose : "idle", { animate:true });
+  if (mode === "home"){ S.view = "main"; els.hMain.hidden = false; els.hMoves.hidden = true; setPose(homeRavi, homeRavi.pose, { animate:true }); }
+  S.lastSize = "";
+}
+function update(st){
+  document.documentElement.dataset.theme = st.theme || "light";
+  document.body.classList.toggle("flat", !!st.flat);
+  document.body.classList.toggle("win", st.platform === "windows");
+  if (Array.isArray(st.grabKeys) && st.grabKeys.join() !== GRAB_KEYS.join()){
+    GRAB_KEYS = st.grabKeys; GRAB = K(GRAB_KEYS, "to use the keyboard");
+  }
+  const gained = !!st.focused && !S.focused;
+  S.focused = !!st.focused;
+  document.body.classList.toggle("focused", S.focused);
+  S.sound = !!st.sound;
+  S.nativeChime = !!st.nativeChime;
+
+  if (st.nudge && st.nudge.key !== N.key) openNudge(st.nudge);
+  else if (!st.nudge && N.key){ clearTimers(); stopTick(); Object.assign(N, { key:null, phase:null, leaving:false }); els.nudge.classList.remove("leave"); }
+  if (st.nudge){
+    N.total = st.nudge.total;
+    if (N.phase === "done") els.nDoneText.textContent = `Nice! That's ${N.total} today.`;
+  }
+  if (st.home) renderHome(st.home);
+  const modeChanged = st.mode !== S.mode;
+  setMode(st.mode);
+  renderPill(); renderKeys();
+  measure();
+  if (S.focused && (gained || modeChanged)) focusDefault();
+}
+// act: lets the menu bar drive the card (macOS "Start the stretch", etc.)
+function act(name){
+  if (!N.key) return;
+  if (name === "start" && (N.phase === "due" || N.phase === "intro")) setPhase("active");
+  else if (name === "snooze") leave("snooze");
+  else if (name === "skip") leave("skip", { how:"skip" });
+  else if (name === "done" && N.phase === "active") finish();
+}
+window.Ravi = { update, chime, act };
+post("ready");
+})();
+</script>
+</body>
+</html>

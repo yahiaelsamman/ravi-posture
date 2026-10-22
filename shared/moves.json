@@ -1,0 +1,239 @@
+{
+  "_about": "The 12 moves and Ravi's lines, shared by every version (macOS, Linux, Windows). Edit here, then reinstall.",
+  "moves": [
+    {
+      "id": "chin-tucks",
+      "name": "Chin tucks",
+      "area": "Neck",
+      "dose": "10 slow reps",
+      "reps": 10,
+      "secs": 45,
+      "pose": "tuck",
+      "desc": "Slide your head straight back, like you're making a double chin. Hold for a beat.",
+      "steps": [
+        "Sit tall and look straight ahead.",
+        "Glide your chin straight back. Don't tip your head down.",
+        "Hold for 3 seconds and feel the back of your neck lengthen.",
+        "Let go slowly and repeat."
+      ]
+    },
+    {
+      "id": "thoracic",
+      "name": "Thoracic extension",
+      "area": "Upper back",
+      "dose": "10 reps",
+      "reps": 10,
+      "secs": 40,
+      "pose": "arch",
+      "desc": "Hands behind your head, arch back over the top of your chair.",
+      "steps": [
+        "Scoot to the back of your chair so the backrest meets your mid-back.",
+        "Lace your fingers behind your head, elbows wide.",
+        "Lean back over the backrest and look up. Keep your hips down.",
+        "Come back to upright and repeat."
+      ]
+    },
+    {
+      "id": "walk",
+      "name": "Walkaround",
+      "area": "Whole body",
+      "dose": "2 min",
+      "secs": 120,
+      "pose": "walk",
+      "desc": "Get up and walk a lap. Refill your water. Rest your eyes.",
+      "steps": [
+        "Stand up and leave the screen behind.",
+        "Walk a lap of the floor, the hallway or the kitchen.",
+        "Refill your water on the way.",
+        "Roll your shoulders a few times before you sit back down."
+      ]
+    },
+    {
+      "id": "squeeze",
+      "name": "Shoulder blade squeeze",
+      "area": "Upper back",
+      "dose": "10 reps, 5 s holds",
+      "reps": 10,
+      "secs": 60,
+      "pose": "squeeze",
+      "desc": "Pull your shoulder blades back and down, as if you're pinching a pencil between them.",
+      "steps": [
+        "Sit or stand tall with your arms bent at 90°.",
+        "Draw your shoulder blades together and down.",
+        "Hold for 5 seconds without shrugging.",
+        "Relax and repeat."
+      ]
+    },
+    {
+      "id": "doorway",
+      "name": "Doorway chest stretch",
+      "area": "Chest",
+      "dose": "30 s each side",
+      "secs": 60,
+      "sides": true,
+      "pose": "doorway",
+      "desc": "Forearm on a door frame, step through until you feel it across your chest.",
+      "steps": [
+        "Stand in a doorway with your forearm on the frame, elbow at shoulder height.",
+        "Step the same-side foot forward.",
+        "Turn your chest away gently until you feel a stretch.",
+        "Hold 30 seconds, then switch sides."
+      ]
+    },
+    {
+      "id": "neck-side",
+      "name": "Neck side stretch",
+      "area": "Neck",
+      "dose": "20 s each side",
+      "secs": 40,
+      "sides": true,
+      "pose": "tilt",
+      "desc": "Ear toward your shoulder, then add a light pull with the same-side hand.",
+      "steps": [
+        "Sit tall and let one shoulder drop.",
+        "Tilt your ear toward the other shoulder.",
+        "Rest that hand on your head for a light pull. No yanking.",
+        "Hold 20 seconds, then switch sides."
+      ]
+    },
+    {
+      "id": "reach",
+      "name": "Stand and reach",
+      "area": "Spine",
+      "dose": "5 slow reps",
+      "reps": 5,
+      "secs": 30,
+      "pose": "reach",
+      "desc": "Stand up, reach both arms overhead and grow tall. Lean a little to each side.",
+      "steps": [
+        "Stand with your feet hip-width apart.",
+        "Reach both arms overhead and stretch tall.",
+        "Lean gently to one side, then the other.",
+        "Lower your arms slowly."
+      ]
+    },
+    {
+      "id": "twist",
+      "name": "Seated twist",
+      "area": "Spine",
+      "dose": "3 per side",
+      "reps": 6,
+      "secs": 45,
+      "pose": "twist",
+      "desc": "Sit tall, turn your chest toward the backrest, hold, then switch.",
+      "steps": [
+        "Sit tall with both feet flat on the floor.",
+        "Turn your chest to one side and hold the backrest.",
+        "Breathe out and turn a little further. Hold 5 seconds.",
+        "Return to centre and switch sides."
+      ]
+    },
+    {
+      "id": "wrists",
+      "name": "Wrist and forearm stretch",
+      "area": "Wrists",
+      "dose": "20 s each position",
+      "secs": 40,
+      "pose": "wrist",
+      "desc": "Arm straight, palm out, gently pull your fingers back. Then palm down.",
+      "steps": [
+        "Hold one arm out straight, palm facing away.",
+        "Use the other hand to ease the fingers back.",
+        "Hold 20 seconds, then turn the palm down and press the hand gently.",
+        "Switch arms if you have time."
+      ]
+    },
+    {
+      "id": "eyes",
+      "name": "20-20-20 eye break",
+      "area": "Eyes",
+      "dose": "20 s",
+      "secs": 20,
+      "pose": "gaze",
+      "desc": "Look at something about 6 metres away for 20 seconds. Blink a few times.",
+      "steps": [
+        "Look away from the screen.",
+        "Find something at least 6 metres away, out of a window if you can.",
+        "Keep your focus there for 20 seconds.",
+        "Blink slowly a few times before you look back."
+      ]
+    },
+    {
+      "id": "hip",
+      "name": "Hip flexor stretch",
+      "area": "Hips",
+      "dose": "30 s each side",
+      "secs": 60,
+      "sides": true,
+      "pose": "lunge",
+      "desc": "Step one foot back, tuck your hips under and feel the front of the hip open.",
+      "steps": [
+        "Stand and take a long step back with one foot.",
+        "Bend the front knee a little and tuck your pelvis under.",
+        "Feel the stretch at the front of the back hip. Hold 30 seconds.",
+        "Switch legs."
+      ]
+    },
+    {
+      "id": "calves",
+      "name": "Calf raises",
+      "area": "Legs",
+      "dose": "15 reps",
+      "reps": 15,
+      "secs": 40,
+      "pose": "calf",
+      "desc": "Stand up, rise onto your toes, lower slowly. Hold the desk if you need to.",
+      "steps": [
+        "Stand with your feet hip-width apart, hands on the desk.",
+        "Rise onto the balls of your feet.",
+        "Lower slowly over 2 seconds.",
+        "Repeat."
+      ]
+    }
+  ],
+  "lines": {
+    "off": [
+      "I check on you every few minutes once you start. Press P.",
+      "Nonna's orders: you sit up, I keep the time."
+    ],
+    "running": [
+      "Shoulders down. Lower. There.",
+      "Your spine is not a croissant.",
+      "I'm stuffed with ricotta and I still sit straighter than you.",
+      "Al dente posture: firm, not stiff.",
+      "Screen at eye level. I can see you squinting.",
+      "Feet flat on the floor, please.",
+      "Breathe out. You've been holding that since lunch.",
+      "Twenty minutes is a long time to be shaped like a prawn."
+    ],
+    "paused": [
+      "Taking a break from me? Rude, but fine.",
+      "Paused. I'll be right here, judging gently."
+    ],
+    "meeting": [
+      "Shh. I'll wait until your meeting's over.",
+      "Look attentive. I'll hold your stretch."
+    ],
+    "held": [
+      "One stretch is waiting for when your meeting ends."
+    ],
+    "snooze": [
+      "Fine. Five minutes. I'm counting.",
+      "Snoozing again? Bold.",
+      "Okay, I'm telling Nonna."
+    ],
+    "done": [
+      "Bellissimo.",
+      "Look at that posture.",
+      "Chef's kiss.",
+      "Nonna would be proud."
+    ],
+    "skip": [
+      "Skipped. I'll pretend I didn't see that."
+    ],
+    "back": [
+      "Welcome back. Fresh clock from now.",
+      "You moved, I noticed. Clock starts over."
+    ]
+  }
+}

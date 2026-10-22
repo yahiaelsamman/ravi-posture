@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Ravi for Windows: a tray app around the shared card (../shared), shown in WebView2.
+       Targets .NET Framework 4.8, which ships with Windows 10 and 11, so there's nothing else to install.
+       Builds on Windows, macOS or Linux:  dotnet build -c Release  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyName>Ravi</AssemblyName>
+    <RootNamespace>Ravi</RootNamespace>
+    <ApplicationIcon>assets\ravi.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <Version>1.0.0</Version>
+    <Product>Ravi the Ravioli</Product>
+    <Description>A ravioli who nudges you to stretch every 20 minutes.</Description>
+    <Copyright>Yahia ElSaman</Copyright>
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**" />
+    <None Remove="tests\**" />
+    <!-- the card, moves, fonts and icons every version shares -->
+    <None Include="..\shared\**\*" LinkBase="shared" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="assets\*.ico" CopyToOutputDirectory="PreserveNewest" />
+    <!-- double-click installer that ships next to Ravi.exe -->
+    <None Update="install\*" CopyToOutputDirectory="PreserveNewest" Link="%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>
