@@ -1,0 +1,136 @@
+# Builds and tests every version on its own OS. Each run keeps the packages as downloadable artifacts;
+# pushing a tag like v1.0.0 also publishes them as a GitHub release.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Core tests
+        working-directory: macos/Tests
+        run: swiftc -O -parse-as-library ../Sources/Core.swift CoreTests.swift -o core-tests && ./core-tests ../../shared
+      - name: Build Ravi.app (universal)
+        run: bash macos/build.sh --no-install
+      - name: Smoke test (starts, shows its card, quits)
+        continue-on-error: true
+        run: |
+          open macos/build/Ravi.app
+          sleep 8
+          pgrep -x Ravi
+          open macos/build/Ravi.app   # opening it again shows the home card
+          sleep 4
+          screencapture -x mac-smoke.png || true
+          osascript -e 'quit app "Ravi"'
+          sleep 2
+          cat "$HOME/Library/Application Support/Ravi/state.json"
+      - name: Package
+        run: ditto -c -k --keepParent macos/build/Ravi.app Ravi-macos.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ravi-macos
+          path: Ravi-macos.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-macos
+          path: mac-smoke.png
+          if-no-files-found: ignore
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Core tests
+        working-directory: windows/tests
+        run: |
+          dotnet build -c Release
+          ./bin/Release/net48/CoreTests.exe ../../shared
+      - name: Build
+        working-directory: windows
+        run: dotnet build -c Release
+      - name: Smoke test (starts, shows a stretch, quits)
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $exe = Resolve-Path windows/bin/Release/net48/Ravi.exe
+          $p = Start-Process $exe -ArgumentList '--autostart' -PassThru
+          Start-Sleep 10
+          if ($p.HasExited) { throw "Ravi exited early (code $($p.ExitCode))" }
+          & $exe --stretch          # a second Ravi.exe passes the command to the running one
+          Start-Sleep 5
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+          $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+          [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+          $bmp.Save("$PWD/windows-smoke.png")
+          & $exe --quit
+          Start-Sleep 3
+          Get-Content "$env:APPDATA/Ravi/state.json"
+          if (Test-Path "$env:APPDATA/Ravi/ravi.log") { Get-Content "$env:APPDATA/Ravi/ravi.log" }
+          if (-not $p.HasExited) { Stop-Process $p -Force; throw "Ravi didn't quit" }
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force pkg/Ravi | Out-Null
+          Copy-Item windows/bin/Release/net48/* pkg/Ravi -Recurse
+          Remove-Item pkg/Ravi/Microsoft.Web.WebView2.Wpf.dll -ErrorAction SilentlyContinue
+          Compress-Archive -Path pkg/Ravi -DestinationPath Ravi-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ravi-windows
+          path: Ravi-windows.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-windows
+          path: windows-smoke.png
+          if-no-files-found: ignore
+
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint
+        run: |
+          pip install --quiet pyflakes
+          python3 -m pyflakes linux/ravi.py
+          bash -n linux/install.sh
+          bash -n linux/uninstall.sh
+          python3 -c "import json; d = json.load(open('shared/moves.json')); assert len(d['moves']) == 12"
+      - name: Package
+        run: |
+          mkdir -p pkg/ravi-posture
+          cp -r linux shared README.md LICENSE pkg/ravi-posture/
+          tar -C pkg -czf Ravi-linux.tar.gz ravi-posture
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Ravi-linux
+          path: Ravi-linux.tar.gz
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [macos, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: Ravi-*
+          merge-multiple: true
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" Ravi-macos.zip Ravi-windows.zip Ravi-linux.tar.gz --repo "$GITHUB_REPOSITORY" --title "Ravi $GITHUB_REF_NAME" --generate-notes
