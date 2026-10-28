@@ -57,7 +57,7 @@ enum CoreTests {
 
         print("boot")
         core.boot()
-        check(core.moves.count == 12, "12 moves loaded from shared/moves.json")
+        check(core.moves.count == 24, "24 moves loaded from shared/moves.json")
         check(core.st.run.running && near(core.st.run.nextDueAt, now + 1200), "starts watching, first stretch in 20 min")
         check(FileManager.default.fileExists(atPath: stateFile.path), "state.json written")
 
@@ -174,7 +174,7 @@ enum CoreTests {
         let home = state["home"] as! [String: Any]
         check(state["mode"] as? String == "home" && state["platform"] as? String == "macos", "mode and platform")
         check(state["nativeChime"] as? Bool == true && state["grabKeys"] as? [String] == ["⌃", "⌥", "R"], "native chime and ⌃⌥R hints")
-        check((home["week"] as! [Any]).count == 7 && (home["moves"] as! [Any]).count == 12, "7-day bars and 12 moves")
+        check((home["week"] as! [Any]).count == 7 && (home["moves"] as! [Any]).count == 24, "7-day bars and 24 moves")
         check(((home["week"] as! [[String: Any]]).last?["d"] as? String) == "Today", "last bar is today")
         check(((home["today"] as! [String: Any])["done"] as? Int) == 1, "today's count")
 

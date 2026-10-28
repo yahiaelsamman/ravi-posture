@@ -1,5 +1,5 @@
 {
-  "_about": "The 12 moves and Ravi's lines, shared by every version (macOS, Linux, Windows). Edit here, then reinstall.",
+  "_about": "The moves and Ravi's lines, shared by every version (macOS, Linux, Windows). Every move works seated or standing at a desk, with no floor and no kit, so it fits an office, a library or home. Edit here, then reinstall.",
   "moves": [
     {
       "id": "chin-tucks",
@@ -74,7 +74,7 @@
       "pose": "doorway",
       "desc": "Forearm on a door frame, step through until you feel it across your chest.",
       "steps": [
-        "Stand in a doorway with your forearm on the frame, elbow at shoulder height.",
+        "Stand in a doorway (or at the edge of a wall or bookshelf) with your forearm on the frame, elbow at shoulder height.",
         "Step the same-side foot forward.",
         "Turn your chest away gently until you feel a stretch.",
         "Hold 30 seconds, then switch sides."
@@ -188,6 +188,202 @@
         "Rise onto the balls of your feet.",
         "Lower slowly over 2 seconds.",
         "Repeat."
+      ]
+    },
+    {
+      "id": "chair-angels",
+      "name": "Chair angels",
+      "area": "Upper back",
+      "dose": "10 slow reps",
+      "reps": 10,
+      "secs": 60,
+      "pose": "angel",
+      "desc": "Back against the chair, arms in a W. Slide them up into a Y without shrugging.",
+      "steps": [
+        "Sit tall with your upper back against the backrest.",
+        "Bend your elbows into a W, hands at head height, shoulder blades down.",
+        "Slide your arms up into a Y. Keep your ribs down and your shoulders away from your ears.",
+        "Pull back down into the W, squeezing low between your shoulder blades. Repeat."
+      ]
+    },
+    {
+      "id": "levator",
+      "name": "Levator scapulae stretch",
+      "area": "Neck",
+      "dose": "20 s each side",
+      "secs": 40,
+      "sides": true,
+      "pose": "levator",
+      "desc": "Nose toward your armpit, then let your hand ease your head down. For the tight spot where neck meets shoulder blade.",
+      "steps": [
+        "Sit tall and hold the side of your seat with one hand to anchor that shoulder.",
+        "Turn your head away from that side and look down toward your other armpit.",
+        "Rest your free hand on the back of your head and let its weight add a gentle pull.",
+        "Hold 20 seconds, breathing out slowly, then switch sides."
+      ]
+    },
+    {
+      "id": "shoulder-rolls",
+      "name": "Shoulder rolls",
+      "area": "Shoulders",
+      "dose": "10 slow rolls",
+      "reps": 10,
+      "secs": 30,
+      "pose": "rolls",
+      "desc": "Shrug up, squeeze back, drop down. Slow, backward circles.",
+      "steps": [
+        "Sit or stand tall with your arms loose.",
+        "Lift your shoulders up toward your ears.",
+        "Roll them back, drawing your shoulder blades together.",
+        "Let them drop all the way down, then go round again."
+      ]
+    },
+    {
+      "id": "cat-cow",
+      "name": "Seated cat-cow",
+      "area": "Lower back",
+      "dose": "8 slow reps",
+      "reps": 8,
+      "secs": 50,
+      "pose": "catcow",
+      "desc": "Hands on your knees. Round your back as you breathe out, lift your chest as you breathe in.",
+      "steps": [
+        "Sit near the front of your chair, feet flat, hands on your knees.",
+        "Breathe out and round your back, tucking your chin and pelvis.",
+        "Breathe in and roll your pelvis forward, lifting your chest and gaze.",
+        "Move slowly between the two and keep it pain-free."
+      ]
+    },
+    {
+      "id": "figure-4",
+      "name": "Seated figure-4 stretch",
+      "area": "Hips",
+      "dose": "30 s each side",
+      "secs": 60,
+      "sides": true,
+      "pose": "figure4",
+      "desc": "Ankle over the opposite knee, sit tall and hinge forward until you feel it in your seat.",
+      "steps": [
+        "Sit tall and cross one ankle over the opposite knee.",
+        "Let the crossed knee drop open. Flex that foot.",
+        "Keep your back long and hinge forward from your hips until you feel the stretch in your seat.",
+        "Hold 30 seconds, then switch legs. Back off if you feel a pinch in the hip."
+      ]
+    },
+    {
+      "id": "hamstring",
+      "name": "Seated hamstring stretch",
+      "area": "Legs",
+      "dose": "30 s each side",
+      "secs": 60,
+      "sides": true,
+      "pose": "hamstring",
+      "desc": "Edge of the seat, one heel forward with the toes up. Hinge forward with a long back.",
+      "steps": [
+        "Scoot to the front edge of your chair.",
+        "Straighten one leg, heel on the floor, toes pointing up.",
+        "Hands on your thigh, keep your back long and lean forward from your hips.",
+        "Stop at a gentle stretch behind the thigh. Hold 30 seconds, then switch."
+      ]
+    },
+    {
+      "id": "sit-to-stand",
+      "name": "Sit-to-stands",
+      "area": "Legs",
+      "dose": "10 slow reps",
+      "reps": 10,
+      "secs": 45,
+      "pose": "sitstand",
+      "desc": "Stand up from your chair without using your hands, then sit back down slowly.",
+      "steps": [
+        "Sit near the front of your chair, feet hip-width apart and under your knees.",
+        "Lean forward a little, reach your arms out and stand all the way up.",
+        "Sit back down slowly, taking about 3 seconds, and just touch the seat.",
+        "Repeat. Make sure your chair won't roll away."
+      ]
+    },
+    {
+      "id": "desk-pushups",
+      "name": "Desk push-ups",
+      "area": "Chest",
+      "dose": "10 reps",
+      "reps": 10,
+      "secs": 40,
+      "pose": "pushup",
+      "desc": "Hands on the edge of a sturdy desk, feet back. Lower your chest, then push away.",
+      "steps": [
+        "Check the desk is sturdy and won't slide or tip.",
+        "Hands on its edge a little wider than your shoulders, walk your feet back.",
+        "Keep your body in a straight line and lower your chest toward the desk.",
+        "Push back up. Repeat."
+      ]
+    },
+    {
+      "id": "tendon-glides",
+      "name": "Tendon glides",
+      "area": "Hands",
+      "dose": "5 rounds",
+      "reps": 5,
+      "secs": 40,
+      "unit": "Round",
+      "pose": "glides",
+      "desc": "Fingers straight, hook, full fist, open again. Keeps the tendons gliding after a lot of typing.",
+      "steps": [
+        "Hold your hands up, fingers straight and together.",
+        "Bend only the top two finger joints into a hook. Knuckles stay straight.",
+        "Curl into a full fist, thumb on the outside.",
+        "Open back to straight. Hold each shape for 2 to 3 seconds."
+      ]
+    },
+    {
+      "id": "brugger",
+      "name": "Brügger relief position",
+      "area": "Chest",
+      "dose": "3 × 10 s holds",
+      "reps": 3,
+      "secs": 45,
+      "unit": "Hold",
+      "pose": "brugger",
+      "desc": "Edge of the seat, knees wide, arms out with your palms forward. Lift your chest and breathe.",
+      "steps": [
+        "Sit at the front edge of your chair, knees wide, feet turned slightly out.",
+        "Let your arms hang beside you and turn your palms forward, thumbs pointing back.",
+        "Lift your chest, draw your shoulders back and down, and tuck your chin a little.",
+        "Hold 10 seconds while breathing into your belly. Relax, then repeat."
+      ]
+    },
+    {
+      "id": "breathing",
+      "name": "Belly breathing",
+      "area": "Breathing",
+      "dose": "6 slow breaths",
+      "reps": 6,
+      "secs": 60,
+      "unit": "Breath",
+      "pose": "breathe",
+      "desc": "Hands on your belly. In through your nose for 4, out slowly for 6. Silent, so it works anywhere.",
+      "steps": [
+        "Sit tall and rest your hands on your belly.",
+        "Breathe in through your nose for about 4 seconds and feel your hands move out.",
+        "Breathe out slowly for about 6 seconds. Keep your shoulders still.",
+        "Repeat for 6 breaths."
+      ]
+    },
+    {
+      "id": "ankle-pumps",
+      "name": "Ankle pumps",
+      "area": "Ankles",
+      "dose": "20 pumps",
+      "reps": 20,
+      "secs": 40,
+      "unit": "Pump",
+      "pose": "ankles",
+      "desc": "Under the desk: toes up, toes down. Gets the blood moving in your calves. Nobody will notice.",
+      "steps": [
+        "Sit with your heels on the floor.",
+        "Pull your toes up toward your shins.",
+        "Point them down and press the balls of your feet into the floor.",
+        "Keep a steady rhythm. Add a few ankle circles each way at the end."
       ]
     }
   ],

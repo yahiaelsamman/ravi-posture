@@ -14,7 +14,11 @@ last seven days sit one shortcut away.
 - **Keyboard all the way.** Enter starts, D finishes, S snoozes, X skips, M tucks it into a pill.
 - **Knows when you're away.** Lock the screen or close the lid for 3+ minutes and the clock starts over.
 - **In a meeting?** One switch holds any stretch until you're out.
-- **Twelve moves** for neck, back, chest, wrists, hips, legs and eyes. Switch off the ones you don't want.
+- **24 moves** for neck, back, chest, shoulders, hands, hips, legs, eyes and breathing, drawn from office-ergonomics and
+  physio desk routines. All of them work at a desk with no floor and no kit, so they fit an office, a library or home.
+  Switch off the ones you don't want.
+- **Ravi has a skeleton.** Fixed-length bones and two-bone IK keep his arms and legs from stretching, feet stay
+  planted, hands open and close, and he switches sides with you halfway through a one-sided stretch.
 
 ## Install
 
@@ -39,7 +43,7 @@ operating system has to: a floating always-on-top window that doesn't take focus
 icon, the global shortcut, start at login and noticing when the screen locks.
 
 ```
-shared/     card.html, moves.json (the 12 moves and Ravi's lines), fonts, icons
+shared/     card.html, moves.json (the 24 moves and Ravi's lines), fonts, icons
 windows/    C# on .NET Framework 4.8 + WebView2: tray icon, RegisterHotKey, Run key
 linux/      Python + GTK 3 + WebKitGTK: top-bar indicator, GNOME custom shortcut, autostart entry
 macos/      Swift + AppKit + WKWebView: menu-bar item, Carbon hot key, SMAppService login item

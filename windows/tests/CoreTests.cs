@@ -68,7 +68,7 @@ static class CoreTests
         Console.WriteLine("boot");
         core.Boot();
         var r = core.St.run;
-        Check(core.Moves.Count == 12, "12 moves loaded from shared/moves.json");
+        Check(core.Moves.Count == 24, "24 moves loaded from shared/moves.json");
         Check(r.running && Math.Abs(r.nextDueAt.Value - (now + 1200)) < 0.001, "starts watching, first stretch in 20 min");
         Check(File.Exists(stateFile), "state.json written");
 
@@ -175,7 +175,7 @@ static class CoreTests
         var home = (Dictionary<string, object>)state["home"];
         Dump("home", host.LastJson);
         Check((string)state["mode"] == "home" && (string)state["platform"] == "windows", "mode and platform");
-        Check(((object[])home["week"]).Length == 7 && ((object[])home["moves"]).Length == 12, "7-day bars and 12 moves");
+        Check(((object[])home["week"]).Length == 7 && ((object[])home["moves"]).Length == 24, "7-day bars and 24 moves");
         Check((string)((Dictionary<string, object>)((object[])home["week"])[6])["d"] == "Today", "last bar is today");
         Check(Convert.ToInt32(((Dictionary<string, object>)home["today"])["done"]) == 1, "today's count");
 

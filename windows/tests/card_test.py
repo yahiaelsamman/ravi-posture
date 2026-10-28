@@ -5,6 +5,7 @@ and checks every message the card sends back. Sizes the page like the window Win
     python3 card_test.py <shared dir> <dump dir> <screenshot dir>
 """
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -80,7 +81,8 @@ with sync_playwright() as p:
         pg.keyboard.press("Enter")
         pg.wait_for_timeout(1300)
         check(posted(pg, "phase")[-1]["phase"] == "active", "Enter starts the rep timer")
-        check(pg.inner_text("#nCue").startswith("Rep"), "rep cue shows")
+        cue = pg.inner_text("#nCue")
+        check(re.fullmatch(r"\w+ \d+ of \d+|First side|Switch sides|Hold it|Keep walking", cue) is not None, f"rep cue shows ({cue})")
         fit(pg, "nudge")
         pg.screenshot(path=str(shots / f"{theme}-4-active.png"))
         pg.keyboard.press("m")
