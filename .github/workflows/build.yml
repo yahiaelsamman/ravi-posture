@@ -110,7 +110,7 @@ jobs:
           python3 -m pyflakes linux/ravi.py
           bash -n linux/install.sh
           bash -n linux/uninstall.sh
-          python3 -c "import json; d = json.load(open('shared/moves.json')); assert len(d['moves']) == 12"
+          python3 -c "import json; d = json.load(open('shared/moves.json')); assert len(d['moves']) == 24"
       - name: Package
         run: |
           mkdir -p pkg/ravi-posture
