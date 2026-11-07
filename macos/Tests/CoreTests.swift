@@ -9,6 +9,8 @@ final class FakeHost: RaviHost {
     var presents = 0, hides = 0, releases = 0
     var chimes: [String] = []
     var pushed: () -> Void = {}
+    var idle: Double?                    // seconds since the last key or mouse move; nil = the OS can't say
+    var idleSeconds: Double? { idle }
     var hasFocus: Bool { focus }
     var theme: String { "light" }
     func render(_ s: String) { lastJSON = s }
@@ -166,6 +168,84 @@ enum CoreTests {
         core.onMessage(msg("skip", ["how": "skip"]))
         core.onMessage(msg("moveOn", ["id": "walk", "on": false]))
         check((0..<50).allSatisfy { _ in core.pickMove() != "walk" }, "a move switched off never comes up")
+
+        print("nobody answers")
+        // the Mac is left on: time passes and nobody touches it, so the idle reading grows with the clock
+        var lastInput = now
+        host.idle = 0
+        func advanceIdle(_ secs: Double) {
+            var t = 0.0
+            while t < secs { let step = min(30, secs - t); now += step; t += 30; host.idle = now - lastInput; core.tick() }
+        }
+        func touch() { lastInput = now; host.idle = 0; core.tick() }   // you're back at the keyboard
+        func waitForNudge() { var n = 0; while core.nudge == nil && n < 400 { advanceIdle(30); n += 1 } }
+        let snoozedBefore = core.dayOf().snoozed
+        waitForNudge()
+        check(core.nudge != nil && core.nudge!.intro && core.mode == "nudge", "the nudge comes as usual")
+        let ignored = core.nudge!.move
+        advanceIdle(90)
+        check(core.nudge != nil, "it waits for an answer (90 s in)")
+        advanceIdle(30)
+        check(core.nudge == nil && core.mode == "none" && host.focus == false, "2 minutes, no reaction: it tucks itself away")
+        check(near(core.st.run.nextDueAt, now + 300), "... and tries again in 5 minutes")
+        check(core.dayOf().snoozed == snoozedBefore && core.st.run.snoozedMove == ignored, "... not counted as a snooze, same move comes back")
+        advanceIdle(300)
+        check(core.nudge?.move == ignored, "back after 5 minutes")
+        advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 600), "ignored again: 10 minutes")
+        advanceIdle(600); advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 1800), "and again: 30 minutes")
+        advanceIdle(1800); advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 3600), "and again: an hour")
+        advanceIdle(3600); advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 3600), "after that it stays at an hour")
+        check(core.menuBarText() == "60m", "the menu bar shows the long wait")
+
+        touch()
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 1800), "you're back at the keyboard: fresh 30 minutes")
+        waitForNudge()
+        advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 300), "... and the waits start from 5 minutes again")
+
+        advanceIdle(300)
+        check(core.nudge != nil, "next one arrives")
+        advanceIdle(60)
+        touch()                         // you come back while it's on screen, after a long time away
+        check(core.nudge != nil, "back while it's up: it stays for you")
+        advanceIdle(90)
+        check(core.nudge != nil, "... and gets a fresh 2 minutes")
+        advanceIdle(30)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 300), "... then the ladder restarts at 5 minutes")
+
+        advanceIdle(300); advanceIdle(120)
+        check(near(core.st.run.nextDueAt, now + 600), "10 minutes the second time")
+        advanceIdle(600)
+        check(core.nudge != nil, "next one arrives")
+        core.onMessage(msg("skip", ["how": "skip"]))
+        check(near(core.st.run.nextDueAt, now + 1800), "you react (skip): normal 30 minutes again")
+        waitForNudge(); advanceIdle(120)
+        check(core.nudge == nil && near(core.st.run.nextDueAt, now + 300), "... and reacting reset the ladder")
+
+        waitForNudge()
+        host.focus = true                // you grabbed it with ⌃⌥R and are reading it
+        advanceIdle(600)
+        check(core.nudge != nil && core.mode == "nudge", "a card you're using is never taken away")
+        core.onMessage(msg("minimize"))
+        advanceIdle(1200)
+        check(core.nudge != nil && core.mode == "pill", "a minimized pill is yours to deal with")
+        core.onMessage(msg("skip", ["how": "skip"]))
+        core.stretchNow()
+        host.focus = false
+        advanceIdle(1200)
+        check(core.nudge?.manual == true, "a stretch you asked for stays put")
+        core.onMessage(msg("skip", ["how": "close"]))
+
+        host.idle = nil                  // a desktop that can't report idle time still gets the ladder
+        waitForNudge(); advanceIdle(120)
+        let nextWait = (core.st.run.nextDueAt ?? 0) - now
+        check(core.nudge == nil && (nextWait == 300 || nextWait == 600), "no idle reading: unanswered nudges still back off")
+        host.idle = 0
+        core.onMessage(msg("skip", ["how": "skip"]))
 
         print("what the card gets")
         host.focus = true

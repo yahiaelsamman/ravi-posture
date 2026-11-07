@@ -7,6 +7,7 @@ import Foundation
 @MainActor
 public protocol RaviHost: AnyObject {
     var hasFocus: Bool { get }
+    var idleSeconds: Double? { get }        // seconds since the last key or mouse move; nil if the OS can't say
     var theme: String { get }               // "light" or "dark"
     func render(_ stateJSON: String)        // window.Ravi.update(state) in the card
     func present(focus: Bool)               // show the card for the current mode
@@ -124,6 +125,9 @@ public final class RaviCore {
     public static let intervals = [15, 20, 30, 45, 60]
     static let snoozeSecs: Double = 5 * 60
     public static let awayReset: Double = 3 * 60   // locked or asleep at least this long: start a fresh cycle
+    static let unansweredSecs: Double = 2 * 60     // a nudge nobody reacts to for this long steps back by itself
+    static let backoffMinutes = [5, 10, 30, 60]    // ... for 5 minutes, then 10, then 30, then an hour at a time
+    static let backAfterSecs: Double = 2 * 60      // input after this long untouched means you're back at the keyboard
     static let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
     weak var host: RaviHost?
@@ -140,6 +144,9 @@ public final class RaviCore {
     public var nudge: Nudge?
     public var nudgePhase: String?      // intro | due | active | done
     private var nudgeSeq = 0, snoozeStreak = 0
+    private var ignoredStreak = 0           // nudges in a row that nobody reacted to
+    private var ignoreAt: Double = 0        // when the nudge on screen counts as ignored
+    private var lastIdle: Double?
     private var awaySince: Double?
     private var lastTick: Double = 0
     private var moodPose: String?, bubble = ""
@@ -269,6 +276,7 @@ public final class RaviCore {
 
     private func startCycle() {
         let t = now
+        ignoredStreak = 0
         st.run.running = true; st.run.paused = false; st.run.held = false
         st.run.cycleStart = t; st.run.nextDueAt = t + Double(interval) * RaviCore.minute; st.run.remaining = nil
     }
@@ -446,6 +454,7 @@ public final class RaviCore {
     }
 
     private func scheduleNext() {
+        ignoredStreak = 0
         if st.run.running {
             st.run.cycleStart = now
             st.run.nextDueAt = now + Double(interval) * RaviCore.minute
@@ -459,6 +468,7 @@ public final class RaviCore {
         nudgeSeq += 1
         nudge = Nudge(key: nudgeSeq, move: id, intro: intro, manual: manual, opened: now)
         nudgePhase = intro ? "intro" : "due"
+        ignoreAt = now + RaviCore.unansweredSecs
         if intro {
             say("Up you get. Quick one.")
             if st.settings.sound { host?.chime("nudge") }
@@ -507,11 +517,46 @@ public final class RaviCore {
         }
         st.run.held = false
         st.run.snoozedMove = n.move
+        ignoredStreak = 0
         snoozeStreak += 1
         let sl = lines["snooze"] ?? [""]
         mood("crossed", sl[max(0, min(snoozeStreak, sl.count) - 1)], 4.5)
         save()
         closeNudge()
+    }
+
+    /// Nobody reacted: step back for 5 minutes, then 10, then 30, then an hour at a time.
+    /// Not counted as a snooze; the same move comes back.
+    private func autoSnooze() {
+        guard let n = nudge, !n.manual else { return }
+        let wait = Double(RaviCore.backoffMinutes[min(ignoredStreak, RaviCore.backoffMinutes.count - 1)]) * RaviCore.minute
+        ignoredStreak += 1
+        if st.run.running {
+            st.run.nextDueAt = now + wait
+            st.run.cycleStart = now + wait - Double(interval) * RaviCore.minute
+        } else if st.run.paused {
+            st.run.remaining = wait
+        }
+        st.run.held = false
+        st.run.snoozedMove = n.move
+        say(pick("ignored"))
+        save()
+        closeNudge()
+    }
+
+    /// Input after a long quiet spell: you're back, so forget the backing off.
+    private func watchIdle() {
+        guard let idle = host?.idleSeconds else { lastIdle = nil; return }
+        defer { lastIdle = idle }
+        guard let before = lastIdle, before >= RaviCore.backAfterSecs, idle < before, ignoredStreak > 0 else { return }
+        ignoredStreak = 0
+        if nudge != nil {                       // one is on screen: you get your two minutes
+            ignoreAt = max(ignoreAt, now + RaviCore.unansweredSecs)
+        } else if st.run.running && !st.run.held {
+            startCycle()
+            say(pick("back"))
+            save(); push(); host?.statusChanged()
+        }
     }
 
     public func closeNudge() {
@@ -617,6 +662,7 @@ public final class RaviCore {
         let gap = t - lastTick
         lastTick = t
         if gap > 90 && awaySince == nil { cameBack(gap) }   // the Mac slept without telling us
+        watchIdle()
         if st.run.running, let due = st.run.nextDueAt, t >= due, nudge == nil, awaySince == nil {
             st.run.nextDueAt = nil
             if st.run.meeting {
@@ -627,6 +673,10 @@ public final class RaviCore {
                 save()
                 openNudge(dueMove(), intro: true)
             }
+        }
+        if nudge?.manual == false, nudgePhase == "intro" || nudgePhase == "due", mode == "nudge",
+           awaySince == nil, !(host?.hasFocus ?? false), t >= ignoreAt {
+            autoSnooze()
         }
         if st.run.running && nudge == nil && !st.run.meeting && !st.run.held && moodUntil < t && t - lineAt > 16 {
             say(pick("running"))
@@ -645,6 +695,7 @@ public final class RaviCore {
     public func cameBack(_ away: Double) {
         awaySince = nil
         lastTick = now
+        ignoreAt = max(ignoreAt, now + RaviCore.unansweredSecs)   // a card that was waiting gets a fresh look
         guard away >= RaviCore.awayReset, st.settings.restartWhenAway else { return }
         if let n = nudge, !n.manual, nudgePhase == "intro" || nudgePhase == "due" {
             // you were up and about; that unanswered nudge is moot (not counted as a skip)

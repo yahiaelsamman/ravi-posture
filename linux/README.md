@@ -31,7 +31,9 @@ Settings → Keyboard → Custom Shortcuts with the command `~/.local/bin/ravi -
 
 The top-bar menu has the same controls plus "Start watching when I log in". Locking the screen or closing the
 lid for 3+ minutes restarts the clock, and an unanswered nudge from before you left goes away without counting
-as a skip. The tally is kept in `~/.local/share/ravi/state.json`.
+as a skip. A nudge nobody reacts to for 2 minutes tucks itself away and comes back in 5 minutes, then 10, then 30,
+then hourly, until you're back at the keyboard (GNOME reports that; elsewhere only the unanswered nudge counts).
+The tally is kept in `~/.local/share/ravi/state.json`.
 
 No countdown in the top bar? Turn on the indicator extension:
 `gnome-extensions enable ubuntu-appindicators@ubuntu.com`

@@ -13,6 +13,7 @@ namespace Ravi
     public interface IRaviHost
     {
         bool HasFocus { get; }
+        double? IdleSeconds { get; }          // seconds since the last key or mouse move; null if Windows can't say
         string Theme { get; }                 // "light" or "dark"
         void Render(string stateJson);        // window.Ravi.update(state) in the card
         void Present(bool focus);             // show the card for the current mode
@@ -77,6 +78,9 @@ namespace Ravi
         public static readonly int[] Intervals = { 15, 20, 30, 45, 60 };
         const int SnoozeSecs = 5 * Min;
         public const int AwayReset = 3 * Min;   // locked or asleep at least this long: start a fresh cycle
+        const int UnansweredSecs = 2 * Min;     // a nudge nobody reacts to for this long steps back by itself
+        static readonly int[] BackoffMinutes = { 5, 10, 30, 60 };   // ... for 5 minutes, then 10, then 30, then an hour at a time
+        const int BackAfterSecs = 2 * Min;      // input after this long untouched means you're back at the keyboard
         static readonly string[] DayNames = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
         readonly IRaviHost host;
@@ -94,6 +98,9 @@ namespace Ravi
         public Nudge Nudge;
         public string NudgePhase;                // intro | due | active | done
         int nudgeSeq, snoozeStreak;
+        int ignoredStreak;                       // nudges in a row that nobody reacted to
+        double ignoreAt;                         // when the nudge on screen counts as ignored
+        double? lastIdle;
         double? awaySince;
         double lastTick;
         string moodPose, bubble;
@@ -220,6 +227,7 @@ namespace Ravi
         void StartCycle()
         {
             var now = Now;
+            ignoredStreak = 0;
             R.running = true; R.paused = false; R.held = false;
             R.cycleStart = now; R.nextDueAt = now + Interval * Min; R.remaining = null;
         }
@@ -409,6 +417,7 @@ namespace Ravi
 
         void ScheduleNext()
         {
+            ignoredStreak = 0;
             if (R.running)
             {
                 R.cycleStart = Now;
@@ -423,6 +432,7 @@ namespace Ravi
             nudgeSeq++;
             Nudge = new Nudge { Key = nudgeSeq, Move = id, Intro = intro, Manual = manual, Opened = Now };
             NudgePhase = intro ? "intro" : "due";
+            ignoreAt = Now + UnansweredSecs;
             if (intro) Say("Up you get. Quick one.");
             SetMode("nudge", focus);
             host.StatusChanged();
@@ -475,11 +485,50 @@ namespace Ravi
             else if (R.paused) R.remaining = SnoozeSecs;
             R.held = false;
             R.snoozedMove = Nudge.Move;
+            ignoredStreak = 0;
             snoozeStreak++;
             var sl = lines.TryGetValue("snooze", out var a) ? a : new[] { "" };
             Mood("crossed", sl[Math.Min(snoozeStreak, sl.Length) - 1], 4.5);
             Save();
             CloseNudge();
+        }
+
+        // Nobody reacted: step back for 5 minutes, then 10, then 30, then an hour at a time.
+        // Not counted as a snooze; the same move comes back.
+        void AutoSnooze()
+        {
+            if (Nudge == null || Nudge.Manual) return;
+            double wait = BackoffMinutes[Math.Min(ignoredStreak, BackoffMinutes.Length - 1)] * Min;
+            ignoredStreak++;
+            if (R.running)
+            {
+                R.nextDueAt = Now + wait;
+                R.cycleStart = R.nextDueAt - Interval * Min;
+            }
+            else if (R.paused) R.remaining = wait;
+            R.held = false;
+            R.snoozedMove = Nudge.Move;
+            Say(Pick("ignored"));
+            Save();
+            CloseNudge();
+        }
+
+        // Input after a long quiet spell: you're back, so forget the backing off.
+        void WatchIdle()
+        {
+            var idle = host.IdleSeconds;
+            var before = lastIdle;
+            lastIdle = idle;
+            if (!idle.HasValue || !before.HasValue || before.Value < BackAfterSecs || idle.Value >= before.Value || ignoredStreak == 0) return;
+            ignoredStreak = 0;
+            if (Nudge != null)                   // one is on screen: you get your two minutes
+                ignoreAt = Math.Max(ignoreAt, Now + UnansweredSecs);
+            else if (R.running && !R.held)
+            {
+                StartCycle();
+                Say(Pick("back"));
+                Save(); Push(); host.StatusChanged();
+            }
         }
 
         public void CloseNudge()
@@ -584,6 +633,7 @@ namespace Ravi
             var gap = now - lastTick;
             lastTick = now;
             if (gap > 90 && awaySince == null) CameBack(gap);   // the PC slept without telling us
+            WatchIdle();
             if (R.running && R.nextDueAt.HasValue && now >= R.nextDueAt.Value && Nudge == null && awaySince == null)
             {
                 R.nextDueAt = null;
@@ -599,6 +649,9 @@ namespace Ravi
                     OpenNudge(DueMove(), intro: true);
                 }
             }
+            if (Nudge != null && !Nudge.Manual && (NudgePhase == "intro" || NudgePhase == "due") && Mode == "nudge"
+                && awaySince == null && !host.HasFocus && now >= ignoreAt)
+                AutoSnooze();
             if (R.running && Nudge == null && !R.meeting && !R.held && moodUntil < now && now - lineAt > 16)
                 Say(Pick("running"));
             host.StatusChanged();
@@ -620,6 +673,7 @@ namespace Ravi
         {
             awaySince = null;
             lastTick = Now;
+            ignoreAt = Math.Max(ignoreAt, Now + UnansweredSecs);   // a card that was waiting gets a fresh look
             if (away < AwayReset) return;
             if (Nudge != null && !Nudge.Manual && (NudgePhase == "intro" || NudgePhase == "due"))
             {

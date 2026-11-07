@@ -129,6 +129,7 @@ namespace Ravi
 
         // ------------------------------------------------------------ IRaviHost
         public bool HasFocus => focused;
+        public double? IdleSeconds => Native.IdleSeconds();
 
         public string Theme
         {

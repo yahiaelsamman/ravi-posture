@@ -60,6 +60,24 @@ namespace Ravi
         [DllImport("dwmapi.dll")]
         public static extern int DwmSetWindowAttribute(IntPtr hWnd, int attr, ref int value, int size);
 
+        [StructLayout(LayoutKind.Sequential)]
+        struct LASTINPUTINFO
+        {
+            public uint cbSize;
+            public uint dwTime;
+        }
+
+        [DllImport("user32.dll")]
+        static extern bool GetLastInputInfo(ref LASTINPUTINFO info);
+
+        /// <summary>Seconds since the last key or mouse move in this session, or null if Windows won't say.</summary>
+        public static double? IdleSeconds()
+        {
+            var info = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf(typeof(LASTINPUTINFO)) };
+            if (!GetLastInputInfo(ref info)) return null;
+            return unchecked((uint)Environment.TickCount - info.dwTime) / 1000.0;   // both are ms since boot and wrap together
+        }
+
         public static long GetExStyle(IntPtr hWnd) =>
             IntPtr.Size == 8 ? GetWindowLongPtr64(hWnd, GWL_EXSTYLE).ToInt64() : GetWindowLong32(hWnd, GWL_EXSTYLE);
 

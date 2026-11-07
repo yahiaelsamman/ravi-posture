@@ -221,6 +221,12 @@ final class RaviApp: NSObject, NSApplicationDelegate, NSMenuDelegate, NSWindowDe
 
     var hasFocus: Bool { focused }
 
+    /// Seconds since a key, click, scroll or mouse move: how long nobody has touched the Mac.
+    var idleSeconds: Double? {
+        let inputs: [CGEventType] = [.keyDown, .mouseMoved, .leftMouseDown, .rightMouseDown, .otherMouseDown, .scrollWheel]
+        return inputs.map { CGEventSource.secondsSinceLastEventType(.combinedSessionState, eventType: $0) }.min()
+    }
+
     var theme: String {
         NSApp.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? "dark" : "light"
     }

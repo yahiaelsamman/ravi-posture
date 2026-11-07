@@ -13,6 +13,9 @@ last seven days sit one shortcut away.
   hands it over, and pressing it again gives the keyboard back to the app you were in.
 - **Keyboard all the way.** Enter starts, D finishes, S snoozes, X skips, M tucks it into a pill.
 - **Knows when you're away.** Lock the screen or close the lid for 3+ minutes and the clock starts over.
+- **Backs off when nobody's home.** Leave the computer on and walk away: a nudge nobody reacts to for 2 minutes
+  tucks itself away and comes back in 5 minutes, then 10, then 30, then once an hour. The moment you touch the
+  keyboard or mouse again after a break, the clock starts fresh. Minimized pills and stretches you asked for are left alone.
 - **In a meeting?** One switch holds any stretch until you're out.
 - **24 moves** for neck, back, chest, shoulders, hands, hips, legs, eyes and breathing, drawn from office-ergonomics and
   physio desk routines. All of them work at a desk with no floor and no kit, so they fit an office, a library or home.

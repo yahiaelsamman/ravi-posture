@@ -430,6 +430,11 @@
     "back": [
       "Welcome back. Fresh clock from now.",
       "You moved, I noticed. Clock starts over."
+    ],
+    "ignored": [
+      "Nobody home. I'll knock again later.",
+      "No answer. I'll wait. I'm very patient.",
+      "Talking to an empty chair. I'll try again in a bit."
     ]
   }
 }

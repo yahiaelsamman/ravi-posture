@@ -59,6 +59,9 @@ MIN = 60
 INTERVALS = [15, 20, 30, 45, 60]
 SNOOZE = 5 * MIN
 AWAY_RESET = 3 * MIN  # locked or asleep at least this long: start a fresh cycle
+UNANSWERED = 2 * MIN  # a nudge nobody reacts to for this long steps back by itself
+BACKOFF = (5 * MIN, 10 * MIN, 30 * MIN, 60 * MIN)  # ... for 5 minutes, then 10, then 30, then an hour at a time
+BACK_AFTER = 2 * MIN  # input after this long untouched means you're back at the keyboard
 PAD = 20              # transparent margin around the card (room for its shadow)
 EDGE = 6              # gap between that margin and the screen edge
 
@@ -191,6 +194,10 @@ class Ravi(Gtk.Application):
         self.nudge_phase = None
         self.nudge_seq = 0
         self.snooze_streak = 0
+        self.ignored_streak = 0      # nudges in a row that nobody reacted to
+        self.ignore_at = 0           # when the nudge on screen counts as ignored
+        self.last_idle = None
+        self.idle_bus, self.idle_failures = None, 0
         self.js_ready = False
         self.has_focus = False
         self.want_focus = False
@@ -251,6 +258,7 @@ class Ravi(Gtk.Application):
 
     def start_cycle(self):
         now = time.time()
+        self.ignored_streak = 0
         self.run_.update(running=True, paused=False, held=False, cycleStart=now,
                          nextDueAt=now + self.interval_min * MIN, remaining=None)
 
@@ -600,6 +608,7 @@ class Ravi(Gtk.Application):
 
     def schedule_next(self):
         r = self.run_
+        self.ignored_streak = 0
         if r["running"]:
             r["cycleStart"] = time.time()
             r["nextDueAt"] = r["cycleStart"] + self.interval_min * MIN
@@ -611,6 +620,7 @@ class Ravi(Gtk.Application):
         self.nudge_seq += 1
         self.nudge = {"key": self.nudge_seq, "move": mid, "intro": intro, "manual": manual, "opened": time.time()}
         self.nudge_phase = "intro" if intro else "due"
+        self.ignore_at = time.time() + UNANSWERED
         if intro:
             self.say("Up you get. Quick one.")
         self.mode = "nudge"
@@ -667,10 +677,64 @@ class Ravi(Gtk.Application):
             r["remaining"] = SNOOZE
         r["held"] = False
         r["snoozedMove"] = self.nudge["move"]
+        self.ignored_streak = 0
         self.snooze_streak += 1
         self.mood("crossed", LINES["snooze"][min(self.snooze_streak, len(LINES["snooze"])) - 1], 4.5)
         self.save()
         self.close_nudge()
+
+    def auto_snooze(self):
+        """Nobody reacted: step back for 5 minutes, then 10, then 30, then an hour at a time.
+        Not counted as a snooze; the same move comes back."""
+        n = self.nudge
+        if not n or n["manual"]:
+            return
+        wait = BACKOFF[min(self.ignored_streak, len(BACKOFF) - 1)]
+        self.ignored_streak += 1
+        r = self.run_
+        if r["running"]:
+            r["nextDueAt"] = time.time() + wait
+            r["cycleStart"] = r["nextDueAt"] - self.interval_min * MIN
+        elif r["paused"]:
+            r["remaining"] = wait
+        r["held"] = False
+        r["snoozedMove"] = n["move"]
+        self.say(pick(LINES["ignored"]))
+        self.save()
+        self.close_nudge()
+
+    def idle_seconds(self):
+        """Seconds since the last key or mouse move, or None if this desktop can't say (GNOME can)."""
+        if self.idle_failures >= 3:
+            return None
+        try:
+            if self.idle_bus is None:
+                self.idle_bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+            res = self.idle_bus.call_sync("org.gnome.Mutter.IdleMonitor", "/org/gnome/Mutter/IdleMonitor/Core",
+                                          "org.gnome.Mutter.IdleMonitor", "GetIdletime", None,
+                                          GLib.VariantType("(t)"), Gio.DBusCallFlags.NONE, 250, None)
+            self.idle_failures = 0
+            return res.unpack()[0] / 1000.0
+        except GLib.Error:
+            self.idle_failures += 1
+            return None
+
+    def watch_idle(self):
+        """Input after a long quiet spell: you're back, so forget the backing off."""
+        idle = self.idle_seconds()
+        before, self.last_idle = self.last_idle, idle
+        if idle is None or before is None or before < BACK_AFTER or idle >= before or not self.ignored_streak:
+            return
+        self.ignored_streak = 0
+        r = self.run_
+        if self.nudge:  # one is on screen: you get your two minutes
+            self.ignore_at = max(self.ignore_at, time.time() + UNANSWERED)
+        elif r["running"] and not r["held"]:
+            self.start_cycle()
+            self.say(pick(LINES["back"]))
+            self.save()
+            self.push()
+            self.update_indicator()
 
     def close_nudge(self):
         self.nudge = None
@@ -774,6 +838,7 @@ class Ravi(Gtk.Application):
         self.last_tick = now
         if gap > 90 and self.away_since is None:
             self.came_back(gap)  # the laptop slept without telling us
+        self.watch_idle()
         r = self.run_
         if r["running"] and r["nextDueAt"] and now >= r["nextDueAt"] and not self.nudge and self.away_since is None:
             r["nextDueAt"] = None
@@ -784,6 +849,9 @@ class Ravi(Gtk.Application):
             else:
                 self.save()
                 self.open_nudge(self.due_move(), intro=True)
+        if (self.nudge and not self.nudge["manual"] and self.nudge_phase in ("intro", "due") and self.mode == "nudge"
+                and self.away_since is None and not self.has_focus and now >= self.ignore_at):
+            self.auto_snooze()
         if (r["running"] and not self.nudge and not r["meeting"] and not r["held"]
                 and self.mood_until < now and now - self.line_at > 16):
             self.say(pick(LINES["running"]))
@@ -819,6 +887,7 @@ class Ravi(Gtk.Application):
     def came_back(self, away):
         self.away_since = None
         self.last_tick = time.time()
+        self.ignore_at = max(self.ignore_at, time.time() + UNANSWERED)  # a card that was waiting gets a fresh look
         if away < AWAY_RESET:
             return
         if self.nudge and not self.nudge["manual"] and self.nudge_phase in ("intro", "due"):

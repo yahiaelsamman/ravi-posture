@@ -13,6 +13,8 @@ class FakeHost : IRaviHost
     public string LastJson;
     public int Presents, Hides, Releases;
     public Action Pushed = () => { };   // the real window pushes the new state to the card when it presents
+    public double? Idle;                // seconds since the last key or mouse move; null = Windows can't say
+    public double? IdleSeconds => Idle;
     public bool HasFocus => Focus;
     public string Theme => "light";
     public void Render(string json) => LastJson = json;
@@ -167,6 +169,86 @@ static class CoreTests
         Check(core.St.settings.sound, "chime on");
         core.OnMessage(Msg("moveOn", "id", "walk", "on", false));
         Check(Enumerable.Range(0, 50).All(_ => core.PickMove() != "walk"), "a move switched off never comes up");
+
+        Console.WriteLine("nobody answers");
+        // the PC is left on: time passes and nobody touches it, so the idle reading grows with the clock
+        double lastInput = now;
+        host.Idle = 0;
+        host.Focus = false;
+        void AdvanceIdle(double secs)
+        {
+            for (double t = 0; t < secs; t += 30) { now += Math.Min(30, secs - t); host.Idle = now - lastInput; core.Tick(); }
+        }
+        void Touch() { lastInput = now; host.Idle = 0; core.Tick(); }   // you're back at the keyboard
+        void WaitForNudge() { for (int n = 0; core.Nudge == null && n < 400; n++) AdvanceIdle(30); }
+        bool Near(double? a, double b) => a.HasValue && Math.Abs(a.Value - b) < 0.001;
+        var snoozedBefore = core.DayOf().snoozed;
+        WaitForNudge();
+        Check(core.Nudge != null && core.Nudge.Intro && core.Mode == "nudge", "the nudge comes as usual");
+        var ignored = core.Nudge.Move;
+        AdvanceIdle(90);
+        Check(core.Nudge != null, "it waits for an answer (90 s in)");
+        AdvanceIdle(30);
+        Check(core.Nudge == null && core.Mode == "none" && !host.Focus, "2 minutes, no reaction: it tucks itself away");
+        Check(Near(r.nextDueAt, now + 300), "... and tries again in 5 minutes");
+        Check(core.DayOf().snoozed == snoozedBefore && r.snoozedMove == ignored, "... not counted as a snooze, same move comes back");
+        AdvanceIdle(300);
+        Check(core.Nudge != null && core.Nudge.Move == ignored, "back after 5 minutes");
+        AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 600), "ignored again: 10 minutes");
+        AdvanceIdle(600); AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 1800), "and again: 30 minutes");
+        AdvanceIdle(1800); AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 3600), "and again: an hour");
+        AdvanceIdle(3600); AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 3600), "after that it stays at an hour");
+        Check(core.TrayLine().Contains("(60:00)"), "the tray shows the long wait");
+
+        Touch();
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 1800), "you're back at the keyboard: fresh 30 minutes");
+        WaitForNudge();
+        AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 300), "... and the waits start from 5 minutes again");
+
+        AdvanceIdle(300);
+        Check(core.Nudge != null, "next one arrives");
+        AdvanceIdle(60);
+        Touch();                        // you come back while it's on screen, after a long time away
+        Check(core.Nudge != null, "back while it's up: it stays for you");
+        AdvanceIdle(90);
+        Check(core.Nudge != null, "... and gets a fresh 2 minutes");
+        AdvanceIdle(30);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 300), "... then the ladder restarts at 5 minutes");
+
+        AdvanceIdle(300); AdvanceIdle(120);
+        Check(Near(r.nextDueAt, now + 600), "10 minutes the second time");
+        AdvanceIdle(600);
+        Check(core.Nudge != null, "next one arrives");
+        core.OnMessage(Msg("skip", "how", "skip"));
+        Check(Near(r.nextDueAt, now + 1800), "you react (skip): normal 30 minutes again");
+        WaitForNudge(); AdvanceIdle(120);
+        Check(core.Nudge == null && Near(r.nextDueAt, now + 300), "... and reacting reset the ladder");
+
+        WaitForNudge();
+        host.Focus = true;               // you grabbed it with Ctrl+Alt+R and are reading it
+        AdvanceIdle(600);
+        Check(core.Nudge != null && core.Mode == "nudge", "a card you're using is never taken away");
+        core.OnMessage(Msg("minimize"));
+        AdvanceIdle(1200);
+        Check(core.Nudge != null && core.Mode == "pill", "a minimized pill is yours to deal with");
+        core.OnMessage(Msg("skip", "how", "skip"));
+        core.StretchNow();
+        host.Focus = false;
+        AdvanceIdle(1200);
+        Check(core.Nudge != null && core.Nudge.Manual, "a stretch you asked for stays put");
+        core.OnMessage(Msg("skip", "how", "close"));
+
+        host.Idle = null;                // a PC that can't report idle time still gets the ladder
+        WaitForNudge(); AdvanceIdle(120);
+        var nextWait = (r.nextDueAt ?? 0) - now;
+        Check(core.Nudge == null && (Math.Abs(nextWait - 300) < 0.001 || Math.Abs(nextWait - 600) < 0.001), "no idle reading: unanswered nudges still back off");
+        host.Idle = 0;
+        core.OnMessage(Msg("skip", "how", "skip"));
 
         Console.WriteLine("what the card gets");
         host.Focus = true;
