@@ -48,10 +48,26 @@ hurts, and see a physio for pain that sticks around.
 
 ## How Ravi shows them
 
-Ravi has a skeleton (`shared/card.html`, "Ravi's skeleton"). His body is the root bone and pivots at the hips;
-each arm and leg is two bones of fixed length solved with two-bone IK, so limbs bend at the elbow and knee
-instead of stretching. A pose is a short loop of keyframes saying where the hands and feet go, plus a hint for
-which way each elbow and knee bends. Feet stay planted, hands can be pinned to a desk or the knees, hands open
-and close, shoes roll onto the toes, and on one-sided stretches Ravi switches sides when the timer does.
+A skeleton alone didn't read at 90 px, so Ravi is animated with the classic principles (`shared/card.html`,
+"Ravi's skeleton, and how he moves"). Under the hood his body is the root bone and each arm and leg is two bones of
+fixed length solved with two-bone IK, so limbs bend at the elbow and knee. On top of that:
 
-To add a move: add it to `moves.json` with a `pose` name, then add that pose to `POSES` in `card.html`.
+- **Staging.** A prop sets the scene (chair, desk, doorway, window), a faint ghost shows where the move starts, an
+  arrow draws itself along where it goes, a pulsing glow marks where you should feel it, and a magnifier shows hands
+  and ankles at a size you can read. Moves that happen front to back (chin tucks, lunges, sit-to-stands, push-ups) are
+  drawn with Ravi turned to profile, because a front view hides them.
+- **Squash and stretch.** He is pasta: he stretches when he reaches and stands, and squashes when he winds up or lands.
+- **Anticipation.** A small move the wrong way first (the head pokes forward before it tucks back, a crouch before a reach).
+- **Slow in, slow out, and timing.** Every key says how long it takes, how it eases and how long it holds, so a stretch
+  snaps in and then stays, and a rep is quick up and slow down.
+- **Arcs, follow-through and overlap.** Hands and feet travel along arcs, the arms trail the body by a beat and the hands
+  by another, and the face and eyes lead.
+- **Secondary action.** He keeps breathing while he holds a stretch, and blinks.
+- **Exaggeration.** Poses go further than a person would, because small movements vanish at this size.
+
+With "reduce motion" on, he doesn't move: the card shows the peak of the move with its ghost, arrow and glow.
+
+To add a move: add it to `moves.json` with a `pose` name, then add that pose to `POSES` in `card.html`. A pose is a
+loop of keys (`{ d: time to arrive, hold: time held, ease, ...params }`) plus optional `back`/`over` props, a `ghost`,
+`cues` (arrows, glows, a breathing ring, or your own drawing) and a `fit` if it needs a magnifier. Unset params carry on
+from the key before.

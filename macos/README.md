@@ -47,4 +47,4 @@ cd macos/Tests
 swiftc -O -parse-as-library ../Sources/Core.swift CoreTests.swift -o core-tests && ./core-tests ../../shared
 ```
 
-60 checks over a simulated working day. They run on macOS and on Linux (any Swift 5.9+ toolchain).
+84 checks over a simulated working day. They run on macOS and on Linux (any Swift 5.9+ toolchain).

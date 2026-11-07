@@ -61,5 +61,5 @@ dotnet build -c Release && mono bin/Release/net48/CoreTests.exe ../../shared    
 RAVI_DUMP=/tmp/ravi mono bin/Release/net48/CoreTests.exe ../../shared && python3 card_test.py ../../shared /tmp/ravi /tmp/shots
 ```
 
-`CoreTests` runs a working day through the core with a fake clock (51 checks). `card_test.py` feeds the states it
+`CoreTests` runs a working day through the core with a fake clock (76 checks). `card_test.py` feeds the states it
 produced to `card.html` in Chromium, the engine inside WebView2, and steps through a stretch by keyboard and mouse.

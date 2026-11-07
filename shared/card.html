@@ -70,17 +70,17 @@ kbd{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:
 .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 /* ---------- nudge (the web Ravi's notification, now a real window) */
-.nudge{width:416px;padding:14px;position:relative;transform-origin:top right}
+.nudge{width:448px;padding:14px;position:relative;transform-origin:top right}
 .nudge.enter{animation:nudge-in .6s cubic-bezier(.18,1.35,.4,1) both}
 @keyframes nudge-in{from{transform:translate(26px,-6px) scale(.94);opacity:0}}
 .nudge.leave{animation:nudge-out .24s ease-in both}
 @keyframes nudge-out{to{transform:translateX(26px);opacity:0}}
 .n-ctrls{position:absolute;top:8px;right:8px;display:flex;gap:2px;z-index:2}
-.n-grid{display:grid;grid-template-columns:92px minmax(0,1fr);gap:14px;align-items:start}
-.n-art{width:92px;height:100px;border-radius:14px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
-.n-art svg{width:90px;height:100px}
+.n-grid{display:grid;grid-template-columns:124px minmax(0,1fr);gap:14px;align-items:start}
+.n-art{width:124px;height:136px;border-radius:16px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
+.n-art svg{width:122px;height:136px}
 .n-main{display:grid;gap:6px;min-width:0}
-.n-intro{display:grid;align-content:center;justify-items:start;min-height:100px;padding:0 60px 0 0;border:0;background:none;text-align:left;cursor:pointer;border-radius:12px}
+.n-intro{display:grid;align-content:center;justify-items:start;min-height:136px;padding:0 60px 0 0;border:0;background:none;text-align:left;cursor:pointer;border-radius:12px}
 .n-intro small{font-size:14px;color:var(--muted);font-weight:600}
 .n-intro strong{font-family:var(--f-display);font-weight:400;font-size:38px;line-height:1.05;color:var(--tomato)}
 .n-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-right:62px}
@@ -178,23 +178,44 @@ body.flat .pill{border-radius:4px}
 .mv-row .ar{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
 .mv-row .btn-text{font-size:12.5px;padding:3px 6px}
 
-/* mascot (same drawing as the web Ravi) */
+/* mascot (same drawing as the web Ravi), plus the scene around him */
 .ravi{overflow:visible}
 .r-shadow{fill:var(--ink);opacity:.1}
 .r-body{fill:var(--semolina);stroke:var(--outline);stroke-width:3;stroke-linejoin:round}
 .r-pillow{fill:var(--semolina-hi);stroke:var(--crust);stroke-width:1.2;stroke-opacity:.55}
 .r-shine{fill:#fff;opacity:.5}
 .r-forks{fill:none;stroke:var(--crust);stroke-width:1.7;stroke-linecap:round}
-.r-limb{fill:none;stroke:var(--limb);stroke-width:4.4;stroke-linecap:round;stroke-linejoin:round}
-.r-hand{fill:none;stroke:var(--limb);stroke-width:8.6;stroke-linecap:round}
+.r-limb{fill:none;stroke:var(--limb);stroke-width:5.2;stroke-linecap:round;stroke-linejoin:round}
+.r-cap{fill:var(--limb)}
+.r-hand{fill:none;stroke:var(--limb);stroke-width:9.6;stroke-linecap:round}
 .r-shoe{fill:var(--limb)}
-.r-chair *,.r-desk *{fill:none;stroke:var(--chair);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-.r-desk path:first-child{stroke-width:6}
 .f-line{fill:none;stroke:var(--outline);stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round}
 .f-fill{fill:var(--outline)}
 .f-chin{fill:none;stroke:var(--crust);stroke-width:1.8;stroke-linecap:round}
 .f-cheek{fill:var(--tomato);opacity:.28}
 .f-tongue{fill:var(--tomato)}
+/* props: chairs, desks, doorways, windows */
+.r-prop{fill:none;stroke:var(--chair);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.r-prop .thin{stroke-width:2.2;stroke:var(--line)}
+.r-prop .fill{fill:var(--chair);stroke:none}
+.r-prop .soft{fill:var(--sunk);stroke:none}
+/* the ghost: where the move starts */
+.r-ghost{opacity:.26}
+.r-ghost .r-limb,.r-ghost .r-hand{stroke:var(--ink)}
+.r-ghost .r-cap,.r-ghost .r-shoe{fill:var(--ink)}
+/* cues: where it goes and where you feel it */
+.c-arrow,.c-head{fill:none;stroke:var(--tomato);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.c-zone{fill:var(--tomato);fill-opacity:.26;stroke:var(--tomato);stroke-opacity:.7;stroke-width:1.6;stroke-dasharray:3 3}
+.c-ring{fill:var(--basil-soft);fill-opacity:.55;stroke:var(--basil);stroke-opacity:.55;stroke-width:2.5}
+.c-soft{fill:var(--tomato-soft);stroke:none}
+.c-line{fill:none;stroke:var(--tomato);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.c-bubble{fill:var(--surface);stroke:var(--line);stroke-width:2}
+.c-ink{fill:none;stroke:var(--limb);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.c-skin{fill:var(--semolina);stroke:var(--outline);stroke-width:2.2;stroke-linejoin:round}
+.c-ground{fill:none;stroke:var(--chair);stroke-width:3;stroke-linecap:round;opacity:.6}
+.c-out{fill:none;stroke:var(--outline);stroke-linecap:round;stroke-linejoin:round}
+.c-fill{fill:none;stroke:var(--semolina);stroke-linecap:round;stroke-linejoin:round}
+.c-roll{fill:none;stroke:var(--tomato);stroke-opacity:.6;stroke-width:2.2;stroke-dasharray:2.5 3.5;stroke-linecap:round}
 
 @media (prefers-reduced-motion: reduce){
   .nudge.enter{animation:fade-in .2s ease both}
@@ -367,76 +388,55 @@ const FACES = {
   shh:{ eyes:EYES_CALM, mouth:`<circle cx="90" cy="96" r="2.8" class="f-fill"/>` },
   rest:{ eyes:EYES_SHUT, mouth:`<path class="f-line" d="M86 95 Q90 98 94 95"/>` },
 };
-/* ---------- Ravi's skeleton ----------
-   The body is the root bone: it pivots at the hips and carries the shoulders, the hips and the face. Each limb
-   is two bones of fixed length solved with two-bone IK, so a limb bends at the elbow or knee instead of
-   stretching. A limb in a pose is [hint, end]: where the hand or foot goes, and a point the elbow or knee
-   should bend toward. Feet are planted in the room; hands move with the body unless the pose pins them
-   (hands on a desk or on the knees). A pose is a loop of keys, each eased into the next, with an optional
-   hold so a stretch actually pauses at the stretch. Hands are short capsules that open (handL/R > 0) and
-   bend at the wrist (wristL/R, degrees); shoes roll onto the toes with toeL/R. */
+/* ---------- Ravi's skeleton, and how he moves ----------
+   The rig: the body is the root bone and pivots at the hips. Each arm and leg is two bones of fixed length solved
+   with two-bone IK, so limbs bend at the elbow and knee instead of stretching. A limb in a pose is [hint, end]:
+   where the hand or foot goes, and a point the elbow or knee bends toward. Feet stay planted in the room; hands
+   follow the body unless the pose pins them to a desk or a knee.
+
+   The principles, because a skeleton alone doesn't read at 90 px:
+   - Staging: props set the scene (chair, desk, doorway, window), a faint ghost shows where the move starts, an arrow
+     shows where it goes, and a glow marks where you should feel it. Moves that happen front-to-back are drawn in
+     profile (turn), because a front view hides them.
+   - Squash and stretch: Ravi is pasta, so he stretches when he reaches and squashes when he drops or lands.
+   - Anticipation: a small move the wrong way first, then the real one.
+   - Slow in, slow out and timing: every key says how long it takes, how it eases and how long it holds, so a
+     stretch snaps in and then stays, and a rep is quick up and slow down.
+   - Arcs: hands and feet travel along arcs around their joint, not in straight lines.
+   - Follow-through and overlapping action: the body leads, the arms lag a beat, the hands a beat more, the eyes lead.
+   - Secondary action: he breathes even while he holds a stretch, and he blinks.
+   - Exaggeration: the poses go further than a person would.
+   A pose is a loop of keys: { d: time to arrive, hold: time held there, ease, ...params }. Unset params carry on
+   from the key before; the last key eases back into the first. */
+const SVGNS = "http://www.w3.org/2000/svg";
+const mk = (tag, parent, attrs) => {
+  const e = document.createElementNS(SVGNS, tag);
+  if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+};
 const RIG = { shoulder:[[50,88],[130,88]], hip:[[72,126],[108,126]], pivot:[90,128], arm:[27,27], leg:[26,25.5] };
 const mir = p => [180 - p[0], p[1]];
 const arms = a => ({ armL:a, armR:a.map(mir) });
 const legs = l => ({ legL:l, legR:l.map(mir) });
-const BASE = { ...arms([[39,112],[34,138]]), ...legs([[70,152],[68,177]]), shL:[0,0], shR:[0,0], handL:0, handR:0, wristL:0, wristR:0,
-  toeL:0, toeR:0, dx:0, dy:0, rot:0, sx:1, sy:1, ex:0, ey:0, face:"smile" };
-const SEAT = legs([[54,148],[64,176]]);
-const HIPS = arms([[28,106],[50,122]]);
-const KNEES = arms([[34,116],[60,142]]);
-const POSES = {
-  idle:   { p:3.2, keys:[{}, { dy:-1.6, sy:1.012 }] },
-  wave:   { p:0.9, keys:[{ armR:[[156,74],[160,48]], handR:7, face:"grin" }, { armR:[[158,76],[172,56]], wristR:14 }] },
-  cheer:  { p:0.75, keys:[{ ...arms([[34,70],[28,44]]), handL:6, handR:6, face:"grin" }, { ...arms([[30,66],[20,38]]), dy:-7, ...legs([[70,146],[68,170]]) }] },
-  crossed:{ p:3.5, keys:[{ ...HIPS, face:"unimpressed" }, { dy:-1 }] },
-  shh:    { p:3.4, keys:[{ armR:[[140,116],[97,98]], handR:7, wristR:-62, face:"shh" }, { dy:-1 }] },
-  tuck:   { p:3.0, hold:.3, keys:[{ ...HIPS, face:"neutral" }, { sy:.95, dy:1.5, ey:1, face:"tuck" }] },
-  arch:   { p:3.2, hold:.2, chair:true, keys:[{ ...SEAT, ...arms([[26,62],[60,42]]) }, { sy:.95, dy:-2, ey:-3, ...arms([[23,56],[60,38]]), face:"effort" }] },
-  walk:   { p:0.72, keys:[
-    { dy:-2, armL:[[40,108],[48,130]], armR:[[142,110],[140,132]], legL:[[60,146],[70,166]] },
-    { dy:-2, armL:[[38,110],[32,130]], armR:[[140,108],[132,130]], legL:[[70,152],[68,177]], legR:[[120,146],[110,166]] }] },
-  squeeze:{ p:2.6, hold:.3, keys:[{ ...arms([[22,96],[26,64]]) }, { ...arms([[30,100],[30,68]]), shL:[3,2], shR:[-3,2], sx:.97, face:"effort" }] },
-  doorway:{ p:3.0, hold:.3, keys:[{ ...arms([[20,86],[20,56]]), handL:6, handR:6, face:"calm" }, { ...arms([[17,84],[14,56]]), sx:1.04, sy:1.04, dy:2 }] },
-  tilt:   { p:3.4, hold:.3, keys:[{ rot:-10, armR:[[150,62],[122,42]], handR:6, wristR:30, face:"calm" }, { rot:-4, armR:[[150,66],[126,44]] }] },
-  reach:  { p:3.0, keys:[{ ...arms([[40,62],[50,28]]), handL:6, handR:6, dy:-3, sy:1.04 }, { rot:-8 }] },
-  twist:  { p:3.2, chair:true, hold:.25, keys:[{ ...SEAT, armL:[[62,118],[98,116]], armR:[[158,100],[148,76]], ex:5, rot:3 },
-    { armL:[[22,100],[32,76]], armR:[[118,118],[82,116]], ex:-5, rot:-3 }] },
-  wrist:  { p:2.4, hold:.35, keys:[{ armL:HIPS.armL, armR:[[156,86],[182,84]], handR:7, wristR:-60, ex:4, face:"neutral" }, { wristR:60 }] },
-  gaze:   { p:4.0, keys:[{ armR:[[148,84],[112,66]], handR:7, wristR:-30, ex:-3, ey:-1 }, { ex:3 }] },
-  lunge:  { p:3.0, hold:.25, keys:[{ ...HIPS, dy:4, legL:[[58,148],[52,177]], legR:[[120,150],[128,178]], toeR:22 },
-    { dy:8, legL:[[54,152],[49,177]], legR:[[122,154],[131,178]], toeR:28, face:"effort" }] },
-  calf:   { p:1.6, keys:[{ ...HIPS }, { dy:-8, ...legs([[70,146],[69,171]]), toeL:32, toeR:32 }] },
-
-  // the new moves
-  angel:  { p:6.0, hold:.2, chair:true, keys:[{ ...SEAT, ...arms([[24,106],[24,80]]), handL:6, handR:6 }, { ...arms([[30,62],[32,36]]), dy:-1, sy:1.02, face:"effort" }] },
-  levator:{ p:3.6, hold:.35, chair:true, keys:[{ ...SEAT, armL:[[30,112],[44,130]], armR:[[152,64],[110,48]], handR:7, wristR:40, rot:-3, ex:-2, ey:1, face:"calm" },
-    { rot:-10, ex:-5, ey:4, armR:[[150,66],[106,50]] }] },
-  rolls:  { p:3.0, keys:[{ face:"calm" }, { shL:[0,-7], shR:[0,-7], sy:1.01 }, { shL:[-3,-3], shR:[3,-3], sx:1.03 }, { shL:[0,2], shR:[0,2], sx:1 }] },
-  catcow: { p:6.0, hold:.2, chair:true, pin:true, keys:[{ ...SEAT, ...KNEES, dy:3, sy:.94, ey:4, face:"calm" }, { dy:-3, sy:1.05, ey:-4, face:"smile" }] },
-  figure4:{ p:4.0, hold:.3, chair:true, pin:true, keys:[{ legL:SEAT.legL, legR:[[134,132],[74,138]], toeR:-20, armL:[[38,120],[66,134]], armR:[[146,118],[124,132]] },
-    { dy:5, sy:.94, ey:3, face:"calm" }] },
-  hamstring:{ p:4.0, hold:.3, chair:true, pin:true, keys:[{ legL:[[46,150],[30,170]], legR:SEAT.legR, toeL:-30, armL:[[36,112],[62,136]], armR:[[144,112],[118,136]] },
-    { dy:5, sy:.93, ey:3, armL:[[30,120],[50,150]], face:"calm" }] },
-  sitstand:{ p:4.5, hold:.15, chair:true, keys:[{ dy:10, sy:.97, ...legs([[50,152],[64,177]]), ...arms([[38,104],[64,86]]), face:"effort" },
-    { dy:0, sy:1, ...legs([[64,152],[66,177]]), ...arms([[38,110],[34,132]]), face:"smile" }] },
-  pushup: { p:4.0, hold:.15, desk:true, pin:true, keys:[{ ...arms([[34,112],[38,132]]), handL:6, handR:6, wristL:-70, wristR:-70 }, { dy:6, sy:.88, ey:3, ...arms([[20,116],[38,132]]), face:"effort" }] },
-  glides: { p:8.0, hold:.35, keys:[{ ...arms([[40,120],[26,88]]), handL:10, handR:10, wristL:-25, wristR:-25, face:"neutral" }, { handL:4.5, handR:4.5 }, { handL:0, handR:0 }] },
-  brugger:{ p:15, hold:.5, chair:true, keys:[{ ...legs([[46,150],[56,176]]), ...arms([[40,112],[38,136]]), face:"calm" },
-    { ...arms([[30,114],[22,136]]), handL:8, handR:8, wristL:-20, wristR:-20, shL:[-2,2], shR:[2,2], dy:-2, sx:1.03, sy:1.03, ey:-2, face:"smile" }] },
-  breathe:{ p:10, hold:.2, keys:[{ ...arms([[32,110],[74,112]]), handL:6, handR:6, wristL:30, wristR:30, face:"rest" }, { sx:1.05, sy:1.04, dy:-1.5 }] },
-  ankles: { p:2.0, chair:true, keys:[{ ...SEAT, ...HIPS, toeL:-28, toeR:-28 }, { toeL:24, toeR:24 }] },
-};
-for (const P of Object.values(POSES)){
-  let k = { ...BASE };
-  P._K = P.keys.map(key => (k = { ...k, ...key }));
-  if (P._K.length < 2) P._K.push(P._K[0]);
-}
+const BASE = { ...arms([[39,112],[34,138]]), ...legs([[70,152],[68,177]]),
+  shL:[0,0], shR:[0,0], handL:0, handR:0, wristL:0, wristR:0, toeL:0, toeR:0,
+  dx:0, dy:0, rot:0, sx:1, sy:1, turn:0, fx:0, fy:0, fr:0, ex:0, ey:0, ls:1, as:1, aux:0, face:"smile" };
+const META = new Set(["d", "hold", "ease"]);
+const clamp01 = v => Math.max(0, Math.min(1, v));
 const lerp = (a, b, k) => a + (b - a) * k;
-const mix = (a, b, k) => typeof a === "number" ? lerp(a, b, k) : Array.isArray(a) ? a.map((v, i) => mix(v, b[i], k)) : k < .5 ? a : b;
+const EASE = {
+  io:   u => u < .5 ? 4*u*u*u : 1 - Math.pow(-2*u + 2, 3) / 2,
+  out:  u => 1 - Math.pow(1 - u, 3),
+  in:   u => u*u*u,
+  lin:  u => u,
+  snap: u => 1 - Math.pow(1 - u, 5),
+  back: u => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(u - 1, 3) + c1 * Math.pow(u - 1, 2); },   // overshoots, then settles
+};
 const pts = (...ps) => ps.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
-// Two-bone IK, from root a toward end t with bones l1 and l2. Ravi faces us, so a joint bends partly toward
-// the camera: the hint's distance from the root-end line says how much of the bend shows sideways (a hint on
-// the line means a knee coming straight at us, seen foreshortened).
+
+// two-bone IK, from root a toward end t with bones l1 and l2. Ravi faces us, so a joint bends partly toward the
+// camera: the hint's distance from the root-end line says how much of the bend shows sideways.
 function ik(a, t, l1, l2, hint){
   const vx = t[0] - a[0], vy = t[1] - a[1], d0 = Math.hypot(vx, vy) || 1e-6;
   const d = Math.min(l1 + l2 - 0.01, Math.max(Math.abs(l1 - l2) + 0.01, d0));
@@ -446,90 +446,617 @@ function ik(a, t, l1, l2, hint){
   const side = (Math.sign(off) || 1) * h * Math.min(1, Math.max(0.25, Math.abs(off) / (h || 1)));
   return [[a[0] + ux*x - uy*side, a[1] + uy*x + ux*side], [a[0] + ux*d, a[1] + uy*d]];
 }
-const RAVI_SVG = `
-<g class="r-rig">
-<ellipse class="r-shadow" cx="90" cy="186" rx="44" ry="5"/>
-<g class="r-chair" style="display:none"><path d="M56 26 H124 M58 26 V44 M122 26 V44"/><path d="M38 128 H142"/><path d="M46 129 L43 190 M134 129 L137 190"/></g>
-<g class="r-legs"><polyline class="r-limb" data-k="legL"/><polyline class="r-limb" data-k="legR"/><ellipse class="r-shoe" data-k="shoeL" rx="7.5" ry="4.2"/><ellipse class="r-shoe" data-k="shoeR" rx="7.5" ry="4.2"/></g>
-<g class="r-upper">
-  <path class="r-body" d="${BODY}"/>
-  <path class="r-pillow" d="${PILLOW}"/>
-  <ellipse class="r-shine" cx="73" cy="63" rx="11" ry="6" transform="rotate(-28 73 63)"/>
-  <path class="r-forks" d="${FORKS}"/>
-  <g class="r-face"><circle class="f-cheek" cx="66.5" cy="91" r="5.2"/><circle class="f-cheek" cx="113.5" cy="91" r="5.2"/><g class="r-eyes"></g><g class="r-mouth"></g></g>
-</g>
-<g class="r-desk" style="display:none"><path d="M14 134 H166"/><path d="M24 136 V192 M156 136 V192"/></g>
-<g><polyline class="r-limb" data-k="armL"/><polyline class="r-limb" data-k="armR"/><path class="r-hand" data-k="handL"/><path class="r-hand" data-k="handR"/></g>
-</g>`;
+
+// a hand or foot travels along an arc around its joint
+function arc(p, q, u, root){
+  const ax = p[0] - root[0], ay = p[1] - root[1], bx = q[0] - root[0], by = q[1] - root[1];
+  const ra = Math.hypot(ax, ay), rb = Math.hypot(bx, by);
+  let da = Math.atan2(by, bx) - Math.atan2(ay, ax);
+  while (da > Math.PI) da -= 2 * Math.PI;
+  while (da < -Math.PI) da += 2 * Math.PI;
+  if (ra < 10 || rb < 10 || Math.abs(da) > 2.7) return [lerp(p[0], q[0], u), lerp(p[1], q[1], u)];
+  const ang = Math.atan2(ay, ax) + da * u, r = lerp(ra, rb, u);
+  return [root[0] + Math.cos(ang) * r, root[1] + Math.sin(ang) * r];
+}
+const lerpAny = (a, b, u) => Array.isArray(a) ? a.map((v, i) => lerpAny(v, b[i], u)) : lerp(a, b, u);
+function mixKeys(a, b, u){
+  const X = {};
+  for (const k in BASE){
+    if (typeof BASE[k] === "number") X[k] = lerp(a[k], b[k], u);
+    else if (k === "face") X[k] = u < .5 ? a[k] : b[k];
+    else if (k === "armL" || k === "armR"){
+      const root = RIG.shoulder[k === "armL" ? 0 : 1];
+      X[k] = [lerpAny(a[k][0], b[k][0], u), arc(a[k][1], b[k][1], u, root)];
+    } else X[k] = lerpAny(a[k], b[k], u);
+  }
+  return X;
+}
+
+const POSES = {};
+// resolve a pose: carry params forward through its keys and lay out the timeline
+function prepare(P){
+  let prev = BASE, acc = 0;
+  P._K = P.keys.map(k => {
+    const key = { ...prev };
+    for (const n in k) key[n] = k[n];
+    key.d = k.d ?? 1; key.hold = k.hold ?? 0; key.ease = k.ease || "io";
+    prev = key;
+    return key;
+  });
+  P._seg = P._K.map(k => { const s = { t0:acc, t1:acc + k.d, t2:acc + k.d + k.hold }; acc = s.t2; return s; });
+  P._total = acc;
+  if (P.peak == null) P.peak = Math.min(1, P._K.length - 1);
+  // where a cue shows: [from, to] key numbers, from the start of the move into `from` to the end of the hold at `to`
+  const span = a => !a ? null : [P._seg[a[0]].t0 / acc, (a[1] >= a[0] ? P._seg[a[1]].t2 : P._seg[a[1]].t2 + acc) / acc];
+  P._cues = (P.cues || []).map(c => ({ ...c, _win:span(c.at) }));
+  return P;
+}
+function at(P, f){
+  const n = P._K.length, T = (((f % 1) + 1) % 1) * P._total;
+  for (let i = 0; i < n; i++){
+    const s = P._seg[i];
+    if (T < s.t2 || i === n - 1){
+      const to = P._K[i];
+      if (T >= s.t1) return to;
+      return mixKeys(P._K[(i + n - 1) % n], to, EASE[to.ease]((T - s.t0) / (s.t1 - s.t0)));
+    }
+  }
+}
+// 0..1: how visible a cue is at loop position f, easing in and out at the edges of its window
+function win(f, w, fade = .06){
+  if (!w) return 1;
+  const g = f < w[0] ? f + 1 : f;
+  return g > w[1] ? 0 : clamp01((g - w[0]) / fade) * clamp01((w[1] - g) / fade);
+}
+
+// ---- drawing: one figure is the legs, the body with its face, and the arms, in back-to-front order
+function buildFigure(parent, withFace){
+  const root = mk("g", parent);
+  const f = { root, behind:mk("g", root), legs:mk("g", root), upper:mk("g", root), front:mk("g", root) };
+  f.legG = [0, 1].map(() => {
+    const g = mk("g", f.legs);
+    return { g, line:mk("polyline", g, { class:"r-limb" }), shoe:mk("ellipse", g, { class:"r-shoe", rx:8.4, ry:4.8 }) };
+  });
+  mk("path", f.upper, { class:"r-body", d:BODY });
+  if (withFace) mk("path", f.upper, { class:"r-forks", d:FORKS });
+  // the head is the raised filling: it slides, tilts and nods on the crimped body
+  f.head = mk("g", f.upper);
+  mk("path", f.head, { class:"r-pillow", d:PILLOW });
+  if (withFace){
+    mk("ellipse", f.head, { class:"r-shine", cx:73, cy:63, rx:11, ry:6, transform:"rotate(-28 73 63)" });
+    f.face = mk("g", f.head, { class:"r-face" });
+    f.face.innerHTML = '<circle class="f-cheek" cx="66.5" cy="91" r="5.2"/><circle class="f-cheek" cx="113.5" cy="91" r="5.2"/><g class="r-eyes"></g><g class="r-mouth"></g>';
+    f.eyes = f.face.querySelector(".r-eyes"); f.mouth = f.face.querySelector(".r-mouth");
+  }
+  f.armG = [0, 1].map(() => {
+    const g = mk("g", f.front);
+    return { g, line:mk("polyline", g, { class:"r-limb" }), cap:mk("circle", g, { class:"r-cap", r:4.8 }), hand:mk("path", g, { class:"r-hand" }) };
+  });
+  f.near = -2;
+  return f;
+}
+
+// put a figure into the pose X. Returns the transform that moves things with the body (for cues that follow it).
+function applyFigure(f, X, P, o){
+  const tt = Math.abs(X.turn), side = X.turn >= 0 ? 1 : -1;
+  const near = tt > .35 ? (X.turn > 0 ? 1 : 0) : -1;           // which side faces us in a profile (0 = L, 1 = R)
+  const br = o.anim && !P.still ? Math.sin(o.now / 3600 * 2 * Math.PI) * .012 : 0;   // a held pose still breathes
+  const sx = X.sx * (1 - .2 * tt) * (1 - br * .5), sy = X.sy * (1 + br);
+  const [px, py] = RIG.pivot, a = X.rot * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
+  const body = p => { const x = (p[0] - px) * sx, y = (p[1] - py) * sy; return [px + X.dx + x*cs - y*sn, py + X.dy + x*sn + y*cs]; };
+  const bodyT = `translate(${X.dx.toFixed(2)} ${X.dy.toFixed(2)}) rotate(${X.rot.toFixed(2)} ${px} ${py}) translate(${px} ${py}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-px} ${-py})`;
+  f.upper.setAttribute("transform", bodyT);
+  {   // the head slides, tilts and narrows with the turn
+    const sc = (1 - .3 * tt) / (1 - .2 * tt);
+    f.head.setAttribute("transform", `translate(${(X.fx + 15 * X.turn).toFixed(2)} ${X.fy.toFixed(2)}) rotate(${X.fr.toFixed(2)} 90 92) translate(90 88) scale(${sc.toFixed(3)} 1) translate(-90 -88)`);
+  }
+  // legs: hips ride on the body, feet stay where they're planted
+  for (let i = 0; i < 2; i++){
+    const s = i ? "R" : "L", leg = f.legG[i];
+    const root = body(RIG.hip[i]);
+    const [knee, ankle] = ik(root, X["leg" + s][1], RIG.leg[0] * X.ls, RIG.leg[1] * X.ls, X["leg" + s][0]);
+    leg.line.setAttribute("points", pts(root, knee, ankle));
+    const out = near >= 0 ? side : (i ? 1 : -1);
+    leg.shoe.setAttribute("cx", (ankle[0] + 3 * out).toFixed(1)); leg.shoe.setAttribute("cy", (ankle[1] + 1.5).toFixed(1));
+    leg.shoe.setAttribute("transform", `rotate(${(X["toe" + s] * out).toFixed(1)} ${ankle[0].toFixed(1)} ${ankle[1].toFixed(1)})`);
+    leg.g.style.opacity = near >= 0 && i !== near ? .5 : 1;
+  }
+  const hide = P.armsBehind ? 2 : near;   // armsBehind: both arms go behind the body, so only elbows show (hands behind the head)
+  if (f.near !== hide){   // the far leg is drawn first, the far arm behind the body
+    f.near = hide;
+    if (near === 0) f.legs.insertBefore(f.legG[1].g, f.legG[0].g); else f.legs.insertBefore(f.legG[0].g, f.legG[1].g);
+    f.armG.forEach((arm, i) => (hide === 2 || (hide >= 0 && i !== hide) ? f.behind : f.front).appendChild(arm.g));
+  }
+  for (let i = 0; i < 2; i++){
+    const s = i ? "R" : "L", arm = f.armG[i], sh = X["sh" + s];
+    const root = body([RIG.shoulder[i][0] + sh[0], RIG.shoulder[i][1] + sh[1]]);
+    const at = p => P.pin === true || P.pin === s ? p : body([p[0] + sh[0], p[1] + sh[1]]);   // a pinned hand stays where it is in the room
+    const [elbow, hand] = ik(root, at(X["arm" + s][1]), RIG.arm[0] * X.as, RIG.arm[1] * X.as, at(X["arm" + s][0]));
+    arm.line.setAttribute("points", pts(root, elbow, hand));
+    arm.cap.setAttribute("cx", root[0].toFixed(1)); arm.cap.setAttribute("cy", root[1].toFixed(1));
+    const w = (X["wrist" + s] * (i ? 1 : -1)) * Math.PI / 180, fx = hand[0] - elbow[0], fy = hand[1] - elbow[1], fl = Math.hypot(fx, fy) || 1;
+    const len = Math.max(0.01, X["hand" + s]), hx = (fx*Math.cos(w) - fy*Math.sin(w)) / fl * len, hy = (fx*Math.sin(w) + fy*Math.cos(w)) / fl * len;
+    arm.hand.setAttribute("d", `M${hand[0].toFixed(1)} ${hand[1].toFixed(1)}l${hx.toFixed(2)} ${hy.toFixed(2)}`);
+    arm.g.style.opacity = near >= 0 && i !== near && !P.armsBehind ? .5 : 1;
+  }
+  return bodyT;
+}
+
+// ---- cues: things drawn around Ravi so the move reads. Each returns a function that updates it every frame.
+const CUES = {
+  // an arrow that draws itself along the path while its window is open
+  arrow(inst, c){
+    const g = mk("g", inst.cueG), path = mk("path", g, { class:"c-arrow", d:c.d, pathLength:100 });
+    const head = mk("path", g, { class:"c-head", d:"M-5 -4.2 L3 0 L-5 4.2" });
+    path.setAttribute("stroke-dasharray", "100");
+    let L = 0;
+    return (f, X, o) => {
+      const a = o.anim ? win(f, c._win) : 1;
+      g.style.display = a > 0 ? "" : "none";
+      if (a <= 0) return;
+      L = L || path.getTotalLength();
+      let q = 1;
+      if (o.anim && c._win){
+        const g0 = f < c._win[0] ? f + 1 : f;
+        q = EASE.out(clamp01((g0 - c._win[0]) / ((c._win[1] - c._win[0]) * (c.draw ?? .45))));
+      }
+      path.setAttribute("stroke-dashoffset", (100 * (1 - q)).toFixed(1));
+      const p1 = path.getPointAtLength(L * q), p0 = path.getPointAtLength(Math.max(0, L * q - 3));
+      head.setAttribute("transform", `translate(${p1.x.toFixed(1)} ${p1.y.toFixed(1)}) rotate(${(Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI).toFixed(1)})`);
+      g.style.opacity = a;
+      if (c.follow) g.setAttribute("transform", o.bodyT);
+    };
+  },
+  // a soft pulsing glow where you should feel it
+  zone(inst, c){
+    const g = mk("g", c.layer === "back" ? inst.back : inst.cueG);
+    mk("ellipse", g, { class:"c-zone", cx:c.x, cy:c.y, rx:c.rx, ry:c.ry, transform:c.rot ? `rotate(${c.rot} ${c.x} ${c.y})` : "" });
+    return (f, X, o) => {
+      const a = o.anim ? win(f, c._win) : 1;
+      g.style.display = a > 0 ? "" : "none";
+      if (a <= 0) return;
+      const pulse = o.anim ? .5 + .5 * Math.sin(o.now / 1000 * 2 * Math.PI / (c.period ?? 1.6)) : .5;
+      g.style.opacity = a * (.55 + .45 * pulse);
+      if (c.follow) g.setAttribute("transform", o.bodyT);
+    };
+  },
+  // a circle that grows and shrinks with the pose's aux value (the breathing guide)
+  ring(inst, c){
+    const e = mk("circle", inst.back, { class:"c-ring", cx:c.x, cy:c.y, r:c.r0 });
+    return (f, X) => e.setAttribute("r", lerp(c.r0, c.r1, clamp01(X.aux)).toFixed(1));
+  },
+  // anything else: build(g, inst) returns update(f, X, o, alpha)
+  dyn(inst, c){
+    const g = mk("g", c.layer === "back" ? inst.back : c.layer === "inset" ? inst.insetG : inst.cueG), upd = c.build(g, inst);
+    return (f, X, o) => {
+      const a = o.anim ? win(f, c._win) : 1;
+      g.style.display = a > 0 ? "" : "none";
+      if (a > 0) upd(f, X, o, a);
+    };
+  },
+};
+
+// ---- the scene around Ravi (props, ghost, cues) is rebuilt whenever his pose changes
+function buildScene(inst){
+  const P = POSES[inst.pose];
+  inst.scene = inst.pose;
+  inst.back.textContent = inst.over.textContent = inst.cueG.textContent = inst.ghostG.textContent = inst.insetG.textContent = "";
+  inst.cues = []; inst.ghostFig = null;
+  inst.world.removeAttribute("transform");
+  if (inst.compact) return;
+  // fit: a pose with a magnifier shrinks Ravi and tucks him into the corner opposite it
+  if (P.fit) inst.world.setAttribute("transform", `translate(${P.fit.x} ${P.fit.y}) translate(90 100) scale(${P.fit.s}) translate(-90 -100)`);
+  inst.back.innerHTML = (P.back || []).map(n => PROPS[n]).join("");
+  inst.over.innerHTML = (P.over || []).map(n => PROPS[n]).join("");
+  if (P.ghost != null){
+    inst.ghostFig = buildFigure(inst.ghostG, false);
+    applyFigure(inst.ghostFig, P._K[P.ghost], P, { now:0, anim:false });
+  }
+  for (const c of P._cues) inst.cues.push(CUES[c.type](inst, c));
+}
+
 const live = new Set();
-function makeRavi(host, pose = "idle"){
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  host.appendChild(svg);
-  svg.setAttribute("viewBox", "0 0 180 200");
-  svg.setAttribute("class", "ravi");
-  svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML = RAVI_SVG;
-  const q = k => svg.querySelector(`[data-k="${k}"]`);
-  return { svg, pose, t0:performance.now(), seed:Math.random()*4000, faceKey:"", eyeKey:"", mirror:false, mirrored:false,
-    rig:svg.querySelector(".r-rig"), upper:svg.querySelector(".r-upper"), chair:svg.querySelector(".r-chair"), desk:svg.querySelector(".r-desk"),
-    eyes:svg.querySelector(".r-eyes"), mouth:svg.querySelector(".r-mouth"),
-    armL:q("armL"), armR:q("armR"), legL:q("legL"), legR:q("legR"), handL:q("handL"), handR:q("handR"), shoeL:q("shoeL"), shoeR:q("shoeR") };
+function makeRavi(host, pose = "idle", opts = {}){
+  const svg = mk("svg", host, { viewBox:"0 0 180 200", class:"ravi", "aria-hidden":"true" });
+  const rig = mk("g", svg, { class:"r-rig" });
+  const inst = { svg, rig, pose, t0:performance.now(), seed:Math.random() * 4000, faceKey:"", eyeKey:"", mirror:false, mirrored:false,
+    compact:!!opts.compact, scene:"", cues:[], ghostFig:null };
+  const world = inst.world = mk("g", rig);   // everything but the magnifier, so a pose can shrink and shift it
+  inst.shadow = mk("ellipse", world, { class:"r-shadow", cx:90, cy:186, rx:44, ry:5 });
+  inst.back = mk("g", world, { class:"r-prop" });
+  inst.ghostG = mk("g", world, { class:"r-ghost" });
+  inst.fig = buildFigure(world, true);
+  inst.over = mk("g", world, { class:"r-prop" });
+  inst.cueG = mk("g", world, { class:"r-cues" });
+  inst.insetG = mk("g", rig, { class:"r-inset" });
+  return inst;
 }
 function setPose(inst, pose, { animate = true } = {}){
   if (!POSES[pose]) pose = "idle";
   if (inst.pose !== pose){ inst.pose = pose; inst.t0 = performance.now(); }
+  if (inst.scene !== inst.pose) buildScene(inst);
   if (animate) live.add(inst); else live.delete(inst);
   drawRavi(inst, performance.now(), animate ? null : 0.85);
 }
-// where the pose is at this moment: two neighbouring keys and how far between them
-function sample(P, now, t0, fixedK){
-  const K = P._K, n = K.length;
-  if (fixedK != null) return [K[0], K[1], fixedK];
-  if (reduced.matches) return [K[0], K[1], 0];
-  const c = ((now - t0) / (P.p * 1000)) % 1 * n, i = Math.floor(c), h = P.hold || 0;
-  const u = Math.min(1, Math.max(0, (c - i - h / 2) / (1 - h)));
-  return [K[i], K[(i + 1) % n], 0.5 - 0.5 * Math.cos(Math.PI * u)];
-}
+const DEFAULT_LAG = { arm:.07, hand:.13, face:.05, eye:.1 };   // seconds: arms and hands trail the body, the face and eyes lead it
 function drawRavi(inst, now, fixedK){
   const P = POSES[inst.pose];
-  const [A, B, k] = sample(P, now, inst.t0, fixedK);
-  const X = {};
-  for (const key in A) X[key] = mix(A[key], B[key], k);
+  if (inst.scene !== inst.pose) buildScene(inst);
+  const anim = fixedK == null && !reduced.matches;
+  let X, f;
+  if (anim){
+    f = (((now - inst.t0) / 1000) / P.p) % 1;
+    const lag = s => ((P.lag && P.lag[s]) ?? DEFAULT_LAG[s]) / P.p;
+    const Xb = at(P, f), Xa = at(P, f - lag("arm")), Xh = at(P, f - lag("hand")), Xf = at(P, f + lag("face")), Xe = at(P, f + lag("eye"));
+    X = { ...Xb, armL:Xa.armL, armR:Xa.armR, shL:Xa.shL, shR:Xa.shR, handL:Xh.handL, handR:Xh.handR, wristL:Xh.wristL, wristR:Xh.wristR,
+      face:Xf.face, fx:Xf.fx, fy:Xf.fy, fr:Xf.fr, ex:Xe.ex, ey:Xe.ey };
+  } else {
+    X = P._K[P.peak]; f = P._seg[P.peak].t1 / P._total;
+  }
   if (inst.mirror !== inst.mirrored){ inst.mirrored = inst.mirror; inst.rig.setAttribute("transform", inst.mirror ? "matrix(-1 0 0 1 180 0)" : ""); }
-  // the root bone
-  const [px, py] = RIG.pivot, a = X.rot * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
-  const body = p => { const x = (p[0] - px) * X.sx, y = (p[1] - py) * X.sy; return [px + X.dx + x*cs - y*sn, py + X.dy + x*sn + y*cs]; };
-  inst.upper.setAttribute("transform", `translate(${X.dx.toFixed(2)} ${X.dy.toFixed(2)}) rotate(${X.rot.toFixed(2)} ${px} ${py}) translate(${px} ${py}) scale(${X.sx.toFixed(3)} ${X.sy.toFixed(3)}) translate(${-px} ${-py})`);
-  // arms: shoulders ride on the body; hands follow it too unless pinned
-  ["L", "R"].forEach((s, i) => {
-    const sh = X["sh" + s], at = p => P.pin ? p : body([p[0] + sh[0], p[1] + sh[1]]);
-    const root = body([RIG.shoulder[i][0] + sh[0], RIG.shoulder[i][1] + sh[1]]);
-    const [hint, end] = X["arm" + s];
-    const [elbow, hand] = ik(root, at(end), RIG.arm[0], RIG.arm[1], at(hint));
-    inst["arm" + s].setAttribute("points", pts(root, elbow, hand));
-    const w = (X["wrist" + s] * (s === "R" ? 1 : -1)) * Math.PI / 180, fx = hand[0] - elbow[0], fy = hand[1] - elbow[1], fl = Math.hypot(fx, fy) || 1;
-    const len = Math.max(0.01, X["hand" + s]), hx = (fx*Math.cos(w) - fy*Math.sin(w)) / fl * len, hy = (fx*Math.sin(w) + fy*Math.cos(w)) / fl * len;
-    inst["hand" + s].setAttribute("d", `M${hand[0].toFixed(1)} ${hand[1].toFixed(1)}l${hx.toFixed(2)} ${hy.toFixed(2)}`);
-  });
-  // legs: hips ride on the body, feet stay where they're planted
-  ["L", "R"].forEach((s, i) => {
-    const root = body(RIG.hip[i]), [hint, foot] = X["leg" + s];
-    const [knee, ankle] = ik(root, foot, RIG.leg[0], RIG.leg[1], hint);
-    inst["leg" + s].setAttribute("points", pts(root, knee, ankle));
-    const out = s === "L" ? -1 : 1, shoe = inst["shoe" + s];
-    shoe.setAttribute("cx", (ankle[0] + 3*out).toFixed(1)); shoe.setAttribute("cy", (ankle[1] + 1.5).toFixed(1));
-    shoe.setAttribute("transform", `rotate(${(X["toe" + s] * out).toFixed(1)} ${ankle[0].toFixed(1)} ${ankle[1].toFixed(1)})`);
-  });
-  inst.chair.style.display = P.chair ? "" : "none";
-  inst.desk.style.display = P.desk ? "" : "none";
-  const faceName = k > 0.5 ? B.face : A.face;
-  const F = FACES[faceName];
-  const blinking = F.blink && fixedK == null && !reduced.matches && ((now + inst.seed) % 4300) < 140;
-  const fk = faceName + (blinking ? "-b" : "");
-  if (fk !== inst.faceKey){ inst.faceKey = fk; inst.eyes.innerHTML = blinking ? EYES_SHUT : F.eyes; inst.mouth.innerHTML = F.mouth; }
+  const bodyT = applyFigure(inst.fig, X, P, { now, anim });
+  const lift = Math.max(0, -X.dy), sink = Math.max(0, X.dy);
+  inst.shadow.setAttribute("rx", (44 - lift * .8 + sink * .25).toFixed(1));
+  inst.shadow.style.opacity = Math.max(.04, .1 - lift * .004);
+  const F = FACES[X.face];
+  const blinking = F.blink && anim && ((now + inst.seed) % 4300) < 140;
+  const fk = X.face + (blinking ? "-b" : "");
+  if (fk !== inst.faceKey){ inst.faceKey = fk; inst.fig.eyes.innerHTML = blinking ? EYES_SHUT : F.eyes; inst.fig.mouth.innerHTML = F.mouth; }
   const ek = X.ex.toFixed(1) + "," + X.ey.toFixed(1);
-  if (ek !== inst.eyeKey){ inst.eyeKey = ek; inst.eyes.setAttribute("transform", `translate(${ek.replace(","," ")})`); }
+  if (ek !== inst.eyeKey){ inst.eyeKey = ek; inst.fig.eyes.setAttribute("transform", `translate(${ek.replace(",", " ")})`); }
+  const o = { now, anim, bodyT };
+  for (const u of inst.cues) u(f, X, o);
 }
+
+// ---- props: the scene around Ravi (stroke and fill come from .r-prop in the stylesheet)
+const PROPS = {
+  floor:  `<path class="thin" d="M10 187 H170"/>`,
+  // a chair seen from the front, and from the side facing right
+  chairF: `<path d="M56 26 H124 M58 26 V44 M122 26 V44"/><path d="M38 128 H142"/><path d="M46 129 L43 190 M134 129 L137 190"/>`,
+  chairP: `<path d="M48 153 H122"/><path d="M50 153 V88"/><path d="M58 155 L55 188 M114 155 L117 188"/>`,
+  // a doorway: the frame you put your forearm on
+  door:   `<path d="M24 12 V188 M156 12 V188 M24 12 H156"/>`,
+  // a desk edge on the right, seen from the side
+  deskP:  `<path d="M118 120 H172"/><path d="M168 122 V188"/>`,
+  // a window with something far away in it
+  window: `<rect class="soft" x="118" y="12" width="56" height="46" rx="4"/><path class="fill" d="M118 52 Q134 34 150 46 T174 40 V54 Q174 58 170 58 H122 Q118 58 118 54 Z"/><circle cx="157" cy="26" r="5.5" style="fill:var(--semolina);stroke:none"/><rect x="118" y="12" width="56" height="46" rx="4"/>`,
+};
+
+// the same arms, legs and chair positions come up again and again
+const HIPS = arms([[28,106],[50,122]]);
+const SEAT = legs([[54,148],[64,176]]);
+const STAND_P = { turn:1, legR:[[99,152],[99,177]], legL:[[95,152],[91,177]], ...arms([[39,112],[34,138]]) };   // standing, in profile
+const LAP = { armR:[[150,108],[128,126]], armL:[[30,108],[52,126]] };                                              // seated, hands on the lap
+const SIT_P = { turn:1, dy:24, legR:[[113,150],[107,176]], legL:[[109,150],[101,176]] };                                        // sitting, in profile
+// rotate about a point on the body instead of about the hips: gives the rot and the dx/dy that go with it
+const about = (cx, cy, deg) => {
+  const a = deg * Math.PI / 180, vx = cx - 90, vy = cy - 128;
+  return { rot:deg, dx:vx - (Math.cos(a) * vx - Math.sin(a) * vy), dy:vy - (Math.sin(a) * vx + Math.cos(a) * vy) };
+};
+
+// ---- drawn insets: a magnifier for the things too small to see at 90 px (hands, ankles)
+let clips = 0;
+function bubble(g, x, y, r){
+  mk("circle", g, { class:"c-bubble", cx:x, cy:y, r });
+  const id = "ravi-clip-" + (++clips);
+  mk("circle", mk("clipPath", g, { id }), { cx:0, cy:0, r:r - 2 });
+  return mk("g", g, { transform:`translate(${x} ${y})`, "clip-path":`url(#${id})` });
+}
+// a cartoon shape is two strokes, a dark one under a light one, so shapes that overlap merge into one outline
+function outlined(outG, fillG, w){
+  const o = mk("path", outG, { class:"c-out", "stroke-width":w + 3.4 }), i = mk("path", fillG, { class:"c-fill", "stroke-width":w });
+  return d => { o.setAttribute("d", d); i.setAttribute("d", d); };
+}
+// a hand seen from the side: forearm, palm, three fingers that curl, a thumb. curl = [knuckle, middle joint, fingertip] in degrees
+function handGlyph(g, scale = 1){
+  const root = mk("g", g, { transform:`translate(-7 0) scale(${scale})` });
+  const fo = mk("g", root), ho = mk("g", root), ff = mk("g", root), hf = mk("g", root);   // outlines first, then fills
+  outlined(fo, ff, 11)("M-38 0 H-3");
+  outlined(ho, hf, 14)("M-3 0 H12");
+  const fingers = [[-3.6, .9], [0, 1], [3.6, .86]].map(([dy, len]) => ({ dy, len, set:outlined(ho, hf, 4.8) }));
+  const thumb = outlined(ho, hf, 5.4); thumb("M3 7 L11 14");
+  return (wrist, curl) => {
+    ho.setAttribute("transform", `rotate(${wrist})`); hf.setAttribute("transform", `rotate(${wrist})`);
+    for (const f of fingers){
+      const a1 = curl[0] * Math.PI / 180, a2 = a1 + curl[1] * Math.PI / 180, a3 = a2 + curl[2] * Math.PI / 180;
+      const p1 = [12 + 10 * f.len * Math.cos(a1), f.dy + 10 * f.len * Math.sin(a1)];
+      const p2 = [p1[0] + 8 * f.len * Math.cos(a2), p1[1] + 8 * f.len * Math.sin(a2)];
+      const p3 = [p2[0] + 6 * f.len * Math.cos(a3), p2[1] + 6 * f.len * Math.sin(a3)];
+      f.set(`M12 ${f.dy} L${p1.map(v => v.toFixed(1)).join(" ")} L${p2.map(v => v.toFixed(1)).join(" ")} L${p3.map(v => v.toFixed(1)).join(" ")}`);
+    }
+  };
+}
+// a shin and a shoe at the ankle; toe > 0 points the toes down
+function footGlyph(g){
+  const root = mk("g", g, { transform:"translate(-2 10) scale(.92)" });
+  const so = mk("g", root), sf = mk("g", root);
+  outlined(so, sf, 12)("M-6 -40 V-4");
+  const foot = mk("g", root);
+  mk("path", foot, { class:"c-skin", d:"M-14 -2 Q-12 -9 -4 -9 L2 -9 L9 -2 Q22 0 22 8 V10 H-14 Z" });
+  mk("path", foot, { class:"c-out", d:"M-14 10 H22", "stroke-width":3 });
+  const up = mk("path", g, { class:"c-arrow", d:"M30 -2 V-18 M25 -13 L30 -19 L35 -13", "stroke-width":3 });
+  const down = mk("path", g, { class:"c-arrow", d:"M30 2 V18 M25 13 L30 19 L35 13", "stroke-width":3 });
+  return toe => {
+    foot.setAttribute("transform", `rotate(${toe} -6 -2)`);
+    up.style.opacity = clamp01(-toe / 20); down.style.opacity = clamp01(toe / 20);
+  };
+}
+const lerp3 = (a, b, k) => a.map((v, i) => lerp(v, b[i], k));
+
+const WRIST_BUBBLE = { type:"dyn", layer:"inset", build(g){
+  const upd = handGlyph(bubble(g, 142, 42, 35), .9);
+  return (f, X) => upd(-X.aux * 64, [0, 0, 0]);
+} };
+
+// ---- the base set: what Ravi does on the home card and between stretches
+POSES.idle = { p:3.6, keys:[{}, { dy:-1.8, sy:1.02, sx:.99, hold:.1 }] };
+POSES.wave = { p:1.1, lag:{ arm:.09, hand:.16 }, keys:[
+  { armR:[[156,76],[162,44]], handR:7, face:"grin" },
+  { armR:[[160,78],[178,60]], wristR:26, d:.5, ease:"back" }] };
+POSES.cheer = { p:1.5, peak:1, keys:[
+  { ...arms([[44,118],[30,138]]), handL:6, handR:6, dy:5, sy:.92, sx:1.05, face:"grin", d:.5, hold:.1 },
+  { ...arms([[34,66],[24,36]]), dy:-13, sy:1.1, sx:.95, ...legs([[70,146],[68,170]]), d:.38, ease:"snap" },
+  { ...arms([[34,100],[20,104]]), dy:4, sy:.9, sx:1.07, ...legs([[70,152],[68,177]]), d:.3, ease:"in" }] };
+POSES.crossed = { p:4, keys:[
+  { ...HIPS, face:"unimpressed" },
+  { rot:-2.2, fx:-1.5, dy:-.6, d:1, hold:.4 },
+  { rot:2, fx:1.5, d:1.2, hold:.3 }] };
+POSES.shh = { p:3.4, keys:[{ armR:[[140,116],[97,98]], handR:7, wristR:-62, face:"shh" }, { dy:-1 }] };
+
+// ---- the moves, in the order of shared/moves.json
+
+// Chin tucks, in profile: the head pokes forward a touch (anticipation), snaps straight back and holds.
+POSES.tuck = { p:4.6, peak:2, ghost:1, back:["floor"],
+  keys:[
+    { ...STAND_P, fx:6, fy:-1, face:"neutral", ex:3, d:1.1, hold:.3 },
+    { fx:12, d:.35, ease:"out" },
+    { fx:-8, fy:2, face:"tuck", d:.5, ease:"snap", hold:2 }],
+  cues:[
+    { type:"zone", x:60, y:66, rx:8, ry:17, follow:true, at:[2, 2] },
+    { type:"arrow", d:"M114 38 H78", at:[2, 2], draw:.3 }] };
+
+// Thoracic extension, in profile on a chair: a little lean forward, then arch back over the backrest.
+const LEAN = about(60, 116, -17);
+POSES.arch = { p:5.2, peak:2, ghost:0, back:["chairP", "floor"], armsBehind:true,
+  keys:[
+    { ...SIT_P, armR:[[160,60],[96,66]], armL:[[20,60],[84,66]], face:"smile", d:.9, hold:.3 },
+    { rot:4, dy:25, face:"neutral", d:.35, ease:"out" },
+    { rot:LEAN.rot, dx:LEAN.dx, dy:LEAN.dy + 24, sy:1.06, fy:-2, ey:-3, face:"effort", d:.75, ease:"snap", hold:1.7 }],
+  cues:[
+    { type:"zone", x:64, y:98, rx:8, ry:15, follow:true, at:[2, 2] },
+    { type:"arrow", d:"M100 44 Q70 36 54 62", at:[2, 2], draw:.4 }] };
+
+// Walkaround, in profile: a proper walk cycle (contact, pass, contact, pass) on a floor that slides by.
+const WALK = (s) => {   // contact with the right foot forward; s = 1, or -1 for the left
+  const R = s > 0;
+  return { legR:R ? [[106,150],[122,177]] : [[84,150],[62,173]], legL:R ? [[84,150],[62,173]] : [[106,150],[122,177]],
+    toeR:R ? 0 : 34, toeL:R ? 34 : 0, armR:R ? [[122,106],[114,124]] : [[138,106],[146,124]], armL:R ? [[58,106],[66,124]] : [[42,106],[34,124]],
+    dy:2, sy:.97, sx:1.02, d:.3 };
+};
+const PASS = (s) => {   // passing: s = 1 when the left leg swings through
+  const R = s > 0;
+  return { legR:R ? [[98,152],[92,177]] : [[102,146],[98,164]], legL:R ? [[102,146],[98,164]] : [[98,152],[92,177]], toeR:0, toeL:0,
+    ...arms([[39,112],[34,138]]), dy:-3, sy:1.03, sx:.99, d:.3 };
+};
+POSES.walk = { p:1.3, peak:0, back:["floor"],
+  keys:[{ ...STAND_P, ...WALK(1), face:"smile" }, PASS(1), WALK(-1), PASS(-1)],
+  cues:[{ type:"dyn", layer:"back", build(g){
+    const d = []; for (let i = 0; i < 8; i++) d.push(mk("path", g, { class:"c-ground" }));
+    return (f, X, o) => { const off = (o.now / 1000 * 90) % 30; d.forEach((e, i) => e.setAttribute("d", `M${i * 30 - off - 6} 191 h14`)); };
+  } }] };
+
+// Shoulder blade squeeze, front: pull the shoulders back and down, and the blades glow as they come together.
+POSES.squeeze = { p:6, peak:1, back:["floor"],
+  keys:[
+    { ...arms([[24,100],[24,68]]), handL:6, handR:6, shL:[-1,-4], shR:[1,-4], sy:.96, sx:1.02, fy:2, face:"neutral", aux:0, d:1.2, hold:.4 },
+    { ...arms([[34,108],[30,72]]), shL:[4,5], shR:[-4,5], sy:1.05, sx:.97, fy:-1, face:"effort", aux:1, d:.7, ease:"snap", hold:3.4 }],
+  cues:[
+    { type:"zone", x:54, y:92, rx:6, ry:19, follow:true, at:[1, 1] },
+    { type:"zone", x:126, y:92, rx:6, ry:19, follow:true, at:[1, 1] },
+    { type:"arrow", d:"M34 62 Q36 84 54 100", at:[1, 1], draw:.4 },
+    { type:"arrow", d:"M146 62 Q144 84 126 100", at:[1, 1], draw:.4 }] };
+
+// Doorway chest stretch: forearm on the frame, lean away so the arm goes taut and the chest opens.
+POSES.doorway = { p:6.4, peak:1, back:["door", "floor"], pin:"R",
+  keys:[
+    { armR:[[154,94],[151,50]], armL:[[40,112],[36,138]], handR:6, face:"calm", d:1.2, hold:.3 },
+    { dx:-13, turn:-.5, rot:-3, sy:1.03, aux:1, d:.8, ease:"snap", hold:3.2 }],
+  cues:[
+    { type:"zone", x:124, y:86, rx:8, ry:21, follow:true, at:[1, 1] },
+    { type:"arrow", d:"M118 100 H72", at:[1, 1], draw:.35 }] };
+
+// Neck side stretch: the head tilts, the far shoulder drops, a light pull from the hand.
+POSES.tilt = { p:5.4, peak:1, back:["floor"],
+  keys:[
+    { armL:[[40,112],[38,138]], armR:[[140,112],[142,138]], face:"calm", d:1, hold:.3 },
+    { fr:-17, fx:-4, fy:3, rot:-3, shR:[0, 5], armL:[[34,62],[74,50]], armR:[[142,118],[146,146]], d:.8, ease:"snap", hold:2.4 }],
+  cues:[
+    { type:"zone", x:114, y:60, rx:9, ry:15, rot:28, follow:true, at:[1, 1] },
+    { type:"arrow", d:"M108 34 Q88 22 64 38", at:[1, 1], draw:.4 }] };
+
+// Stand and reach: crouch to wind up, stretch tall, lean one way, the other, and come down.
+POSES.reach = { p:7, peak:2, back:["floor"],
+  keys:[
+    { face:"smile", d:.8, hold:.1 },
+    { ...arms([[44,120],[34,134]]), dy:5, sy:.93, sx:1.05, face:"effort", d:.4 },
+    { ...arms([[44,64],[52,20]]), handL:6, handR:6, dy:-10, sy:1.13, sx:.94, ey:-3, face:"smile", d:.6, ease:"back", hold:.5 },
+    { rot:13, dx:4, d:.8, hold:.4 },
+    { rot:-13, dx:-4, d:1.1, hold:.4 },
+    { rot:0, dx:0, d:.8 }],
+  cues:[
+    { type:"arrow", d:"M148 120 V40", at:[2, 2], draw:.4 },
+    { type:"arrow", d:"M96 14 Q124 14 140 34", at:[3, 3], draw:.5 },
+    { type:"arrow", d:"M84 14 Q56 14 40 34", at:[4, 4], draw:.5 }] };
+
+// Seated twist: the whole body turns like a card flipping, hands on the knee and the backrest.
+POSES.twist = { p:8.4, peak:1, back:["chairF"],
+  keys:[
+    { ...SEAT, armR:[[142,118],[122,134]], armL:[[38,118],[58,134]], face:"smile", d:1, hold:.3 },
+    { turn:.9, armL:[[66,112],[118,132]], armR:[[150,92],[142,66]], face:"effort", ex:5, d:.8, ease:"snap", hold:1.5 },
+    { turn:0, armR:[[142,118],[122,134]], armL:[[38,118],[58,134]], face:"smile", ex:0, d:.8, hold:.3 },
+    { turn:-.9, armR:[[114,112],[62,132]], armL:[[30,92],[38,66]], face:"effort", ex:-5, d:.8, ease:"snap", hold:1.5 }],
+  cues:[
+    { type:"arrow", d:"M58 32 Q90 18 122 32", at:[1, 1], draw:.4 },
+    { type:"arrow", d:"M122 32 Q90 18 58 32", at:[3, 3], draw:.4 }] };
+
+// Wrist and forearm stretch: both hands in front of the chest, and a magnifier shows the wrist bending back, then down.
+POSES.wrist = { p:6, peak:1, back:["floor"], fit:{ s:.8, x:-16, y:16 },
+  keys:[
+    { armR:[[148,94],[168,92]], armL:HIPS.armL, handR:8, face:"neutral", aux:0, d:1, hold:.2 },
+    { aux:1, d:.7, ease:"out", hold:1.5 },
+    { aux:-1, d:.9, hold:1.5 }],
+  cues:[WRIST_BUBBLE] };
+
+// 20-20-20: look from the screen to something far away, and blink slowly.
+POSES.gaze = { p:7, peak:1, back:["window", "floor"],
+  keys:[
+    { armL:[[40,112],[38,138]], armR:[[140,112],[142,138]], ey:4, fy:2, face:"neutral", d:1, hold:.4 },
+    { turn:.38, ex:6, ey:-3, fy:-1, face:"smile", d:.6, hold:2.4 },
+    { face:"rest", d:.25, hold:.35 },
+    { face:"smile", d:.25, hold:.8 }],
+  cues:[{ type:"arrow", d:"M108 70 L142 44", at:[1, 3], draw:.4 }] };
+
+// Hip flexor stretch, in profile: step back (the back foot swings), sink forward, tuck the pelvis, hold.
+POSES.lunge = { p:6, peak:2, ghost:0, back:["floor"],
+  keys:[
+    { ...STAND_P, ...HIPS, d:1, hold:.3 },
+    { legL:[[80,148],[62,166]], dy:2, d:.5, ease:"out" },
+    { legL:[[76,150],[52,177]], toeL:38, legR:[[116,150],[114,177]], dy:14, dx:6, rot:-4, sy:.99, face:"effort", d:.5, ease:"snap", hold:2.4 }],
+  cues:[
+    { type:"zone", x:76, y:128, rx:10, ry:11, follow:true, at:[2, 2] },
+    { type:"arrow", d:"M82 150 H112", at:[2, 2], draw:.35 }] };
+
+// Calf raises, in profile with a hand on the desk: dip, rise onto the toes (stretch), lower slowly.
+POSES.calf = { p:3.2, peak:2, back:["deskP", "floor"], pin:"R",
+  keys:[
+    { ...STAND_P, armR:[[142,104],[130,119]], toeR:0, toeL:0, d:1.3, hold:.2 },
+    { dy:4, sy:.96, sx:1.03, legR:[[104,152],[99,177]], d:.22 },
+    { dy:-8, sy:1.07, sx:.97, legR:[[99,152],[99,170]], legL:[[95,152],[91,170]], toeR:38, toeL:38, d:.38, ease:"back", hold:.7 }],
+  cues:[
+    { type:"zone", x:97, y:158, rx:8, ry:16, at:[2, 2] },
+    { type:"arrow", d:"M126 176 V150", at:[2, 2], draw:.35 }] };
+
+// Chair angels: arms slide from a W to a Y against the backrest, the see-through blades work, he stretches tall.
+POSES.angel = { p:6.4, peak:2, ghost:0, back:["chairF"],
+  keys:[
+    { ...SEAT, ...arms([[24,106],[30,66]]), handL:6, handR:6, face:"neutral", d:1, hold:.3 },
+    { ...arms([[30,112],[34,72]]), sy:.97, d:.35, ease:"out" },
+    { ...arms([[26,62],[22,22]]), sy:1.07, ey:-3, fy:-1, face:"effort", aux:1, d:1.1, ease:"back", hold:.9 }],
+  cues:[
+    { type:"arrow", d:"M20 70 Q10 44 18 20", at:[1, 2], draw:.55 },
+    { type:"arrow", d:"M160 70 Q170 44 162 20", at:[1, 2], draw:.55 }] };
+
+// Levator scapulae stretch: look toward the armpit, hand behind the head, the nape-to-shoulder line glows.
+POSES.levator = { p:6, peak:1, back:["chairF"],
+  keys:[
+    { ...SEAT, armL:[[34,118],[46,136]], armR:[[146,118],[134,136]], face:"calm", d:1, hold:.3 },
+    { fr:26, fx:6, fy:5, rot:-3, turn:.25, armR:[[150,70],[104,52]], armL:[[30,120],[36,144]], shL:[0,4], d:.8, ease:"snap", hold:2.6 }],
+  cues:[
+    { type:"zone", x:62, y:60, rx:8, ry:15, rot:-30, follow:true, at:[1, 1] },
+    { type:"arrow", d:"M112 40 Q100 62 84 80", at:[1, 1], draw:.4 }] };
+
+// Shoulder rolls: each shoulder travels a circle (up, back, down, forward), and a dashed ring shows the path.
+const ROLL = i => { const a = (-90 + 45 * i) * Math.PI / 180; return { shL:[8 * Math.cos(a), 8 * Math.sin(a)], shR:[-8 * Math.cos(a), 8 * Math.sin(a)] }; };
+POSES.rolls = { p:3.6, peak:1, back:["floor"],
+  keys:[0, 1, 2, 3, 4, 5, 6, 7].map(i => ({ ...ROLL(i), sy:i > 2 && i < 6 ? .985 : 1, face:i > 3 && i < 6 ? "rest" : "calm", d:.45 })),
+  cues:[
+    { type:"dyn", build(g){
+      const ring = mk("g", g);
+      for (const x of [50, 130]) mk("circle", ring, { class:"c-roll", cx:x, cy:88, r:8 });
+      return (f, X, o) => ring.setAttribute("transform", o.bodyT);
+    } },
+    { type:"arrow", d:"M25 77.6 A12 12 0 1 1 19.7 83.9" },
+    { type:"arrow", d:"M155 77.6 A12 12 0 1 0 160.3 83.9" }] };
+
+// Seated cat-cow, in profile: round the back and tuck the chin, then lift the chest and look up.
+POSES.catcow = { p:6.4, peak:1, back:["chairP", "floor"],
+  keys:[
+    { ...SIT_P, ...LAP, face:"calm", d:1, hold:.2 },
+    { rot:-11, sy:.9, sx:1.08, fr:32, fy:12, dy:27, face:"tuck", d:1.2, hold:.9 },
+    { rot:9, dx:4, sy:1.1, sx:.94, fr:-24, fy:-8, ey:-4, dy:21, face:"smile", d:1.3, hold:.9 }],
+  cues:[
+    { type:"arrow", d:"M52 96 Q40 124 58 146", at:[1, 1], draw:.4 },
+    { type:"arrow", d:"M128 70 Q140 100 126 122", at:[2, 2], draw:.4 }] };
+
+// Seated figure-4: ankle over the knee, hinge forward, and the seat of the crossed side glows.
+POSES.figure4 = { p:7, peak:1, back:["chairF"],
+  keys:[
+    { ...SEAT, legR:[[136,132],[76,134]], toeR:-20, armL:[[40,118],[56,136]], armR:[[146,118],[120,132]], face:"calm", d:1, hold:.3 },
+    { dy:7, sy:.9, sx:1.04, fy:6, armR:[[140,116],[96,134]], d:1, ease:"io", hold:2.6 }],
+  cues:[
+    { type:"zone", x:132, y:132, rx:12, ry:8, at:[1, 1] },
+    { type:"arrow", d:"M148 56 V92", at:[1, 1], draw:.35 }] };
+
+// Seated hamstring stretch, in profile: one leg out with the toes up, hinge forward with a flat back.
+POSES.hamstring = { p:6.6, peak:1, ghost:0, back:["chairP", "floor"],
+  keys:[
+    { ...SIT_P, legR:[[126,152],[126,176]], toeR:-38, ...LAP, face:"calm", d:1, hold:.3 },
+    { ...about(90, 128, 24), dy:about(90, 128, 24).dy + 22, armR:[[158,104],[166,130]], armL:[[66,106],[110,132]], face:"effort", d:1, hold:2.6 }],
+  cues:[
+    { type:"zone", x:110, y:160, rx:18, ry:6, at:[1, 1] },
+    { type:"arrow", d:"M84 60 Q110 62 128 86", at:[1, 1], draw:.4 }] };
+
+// Sit-to-stands, in profile: wind up (squash), lean over the toes, stand tall (stretch, overshoot), sit down slowly.
+POSES.sitstand = { p:6.2, peak:3, ghost:0, back:["chairP", "floor"],
+  keys:[
+    { ...SIT_P, ...LAP, face:"smile", d:.5, hold:.5 },
+    { rot:5, dy:25, sy:.95, sx:1.04, armR:[[146,112],[142,124]], armL:[[34,112],[38,124]], face:"effort", d:.45 },
+    { rot:24, dy:19, sy:1, sx:1, armR:[[160,96],[172,90]], armL:[[78,96],[100,92]], fy:-1, ey:-2, d:.55, ease:"in" },
+    { rot:0, dy:0, sy:1.1, sx:.95, ...arms([[39,112],[34,138]]), face:"grin", ey:0, fy:0, d:.5, ease:"back", hold:.5 },
+    { sy:1, sx:1, d:.3 },
+    { rot:12, dy:10, sy:.98, armR:[[156,100],[170,100]], armL:[[76,100],[96,100]], face:"effort", d:1.1 },
+    { rot:2, dy:26, sy:.9, sx:1.07, ...LAP, d:.45, ease:"in" }],
+  cues:[
+    { type:"arrow", d:"M136 150 Q150 118 134 82", at:[2, 3], draw:.5 }] };
+
+// Desk push-ups, in profile: hands on the desk edge, the body leans in and pushes back out.
+POSES.pushup = { p:4.4, peak:1, back:["deskP", "floor"], pin:true,
+  keys:[
+    { turn:1, ...about(90, 128, 36), ls:1.45, armR:[[140,112],[150,118]], armL:[[136,114],[146,120]], legR:[[88,150],[48,177]], legL:[[84,150],[42,177]], toeR:30, toeL:30, face:"neutral", d:1.2, hold:.3 },
+    { ...about(90, 128, 50), dx:about(90, 128, 50).dx + 4, armR:[[134,96],[150,118]], armL:[[130,98],[146,120]], face:"effort", sy:.96, d:1.1, ease:"io", hold:.3 }],
+  cues:[
+    { type:"arrow", d:"M100 70 Q116 76 126 92", at:[1, 1], draw:.4 }] };
+
+// Tendon glides: straight, hook, fist, straight again; the magnifier shows each hand shape.
+const GLIDE = [[0, 0, 0], [0, 80, 55], [85, 95, 50], [80, 0, 0]];
+POSES.glides = { p:9, peak:1, back:["floor"], fit:{ s:.8, x:-16, y:16 },
+  keys:[
+    { ...arms([[40,122],[28,92]]), handL:10, handR:10, wristL:-8, wristR:-8, face:"neutral", aux:0, d:1.2, hold:.8 },
+    { handL:6, handR:6, aux:1, d:.8, hold:.9 },
+    { handL:2.5, handR:2.5, aux:2, d:.8, hold:.9 },
+    { handL:8, handR:8, aux:3, d:.8, hold:.9 }],
+  cues:[{ type:"dyn", layer:"inset", build(g){
+    const upd = handGlyph(bubble(g, 142, 42, 35), .9);
+    return (f, X) => { const i = Math.min(2, Math.floor(X.aux)), k = X.aux - i; upd(0, lerp3(GLIDE[i], GLIDE[i + 1], clamp01(k))); };
+  } }] };
+
+// Brugger relief position: seated at the edge, knees wide, arms turn out, chest lifts, chin tucks.
+POSES.brugger = { p:7, peak:1, back:["chairF"],
+  keys:[
+    { legL:[[40,150],[56,176]], legR:[[140,150],[124,176]], ...arms([[40,114],[40,140]]), shL:[0,-2], shR:[0,-2], sy:.97, fy:3, face:"calm", d:1, hold:.3 },
+    { ...arms([[26,116],[18,142]]), shL:[-2,5], shR:[2,5], sy:1.06, fy:-1, face:"smile", aux:1, d:.9, ease:"snap", hold:2.8 }],
+  cues:[
+    { type:"arrow", d:"M40 100 Q26 112 24 134", at:[1, 1], draw:.4 },
+    { type:"arrow", d:"M140 100 Q154 112 156 134", at:[1, 1], draw:.4 }] };
+
+// Belly breathing: he inflates for 4, deflates for 6, and a ring behind him breathes with him.
+POSES.breathe = { p:10, peak:1, back:["floor"], still:true,
+  keys:[
+    { ...arms([[44,112],[74,112]]), handL:6, handR:6, wristL:30, wristR:30, face:"rest", aux:0, d:6, hold:.4 },
+    { sx:1.09, sy:1.05, dy:-1, aux:1, d:3.6, hold:.4 }],
+  cues:[{ type:"ring", x:90, y:96, r0:56, r1:76 }] };
+
+// Ankle pumps, in profile on a chair: toes up, toes down, and a magnifier shows the foot at the ankle.
+POSES.ankles = { p:2.4, peak:1, back:["chairP", "floor"], fit:{ s:.8, x:-16, y:16 },
+  keys:[
+    { ...SIT_P, ...LAP, toeR:-30, toeL:-30, face:"smile", aux:-1, d:1.2, ease:"io" },
+    { toeR:30, toeL:30, aux:1, d:1.2 }],
+  cues:[{ type:"dyn", layer:"inset", build(g){
+    const upd = footGlyph(bubble(g, 142, 42, 35));
+    return (f, X) => upd(X.aux * 36);
+  } }] };
+
+for (const P of Object.values(POSES)) prepare(P);
 (function frame(now){
   for (const inst of live) drawRavi(inst, now);
   requestAnimationFrame(frame);
@@ -574,8 +1101,8 @@ const S = { mode:"none", focused:false, sound:false, view:"main", lastSize:"", h
 const N = { key:null, move:null, manual:false, phase:null, startedAt:0, timers:[], tick:null, total:0, leaving:false };
 
 const cardRavi = makeRavi(els.nArt, "wave");
-const pillRavi = makeRavi($("pArt"), "idle");
-const homeRavi = makeRavi($("hArt"), "wave");
+const pillRavi = makeRavi($("pArt"), "idle", { compact:true });   // small ones skip the props and cues
+const homeRavi = makeRavi($("hArt"), "wave", { compact:true });
 
 const INTERVALS = [15, 20, 30, 45, 60];
 INTERVALS.forEach((m, i) => {

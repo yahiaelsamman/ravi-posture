@@ -20,8 +20,9 @@ last seven days sit one shortcut away.
 - **24 moves** for neck, back, chest, shoulders, hands, hips, legs, eyes and breathing, drawn from office-ergonomics and
   physio desk routines. All of them work at a desk with no floor and no kit, so they fit an office, a library or home.
   Switch off the ones you don't want.
-- **Ravi has a skeleton.** Fixed-length bones and two-bone IK keep his arms and legs from stretching, feet stay
-  planted, hands open and close, and he switches sides with you halfway through a one-sided stretch.
+- **Ravi acts out every move.** He turns to profile for the ones you can't see from the front, winds up before he
+  moves, stretches and squashes like pasta, and what's around him shows the rest: a chair, a doorway, a ghost of
+  where he started, an arrow for where it goes, a glow where you should feel it, and a magnifier for hands and ankles. He switches sides with you halfway through a one-sided stretch.
 
 ## Install
 
@@ -67,7 +68,7 @@ packages as a release.
 ### Tests
 
 - `macos/Tests` and `windows/tests/CoreTests` walk the timer, tally and keyboard logic through the same
-  working day with a fake clock (60 and 51 checks).
+  working day with a fake clock (84 and 76 checks).
 - `windows/tests/card_test.py` drives `shared/card.html` in Chromium the way the Windows app does
   and checks every message the card sends back.
 

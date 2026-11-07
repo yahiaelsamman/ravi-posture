@@ -60,7 +60,7 @@ with sync_playwright() as p:
         st = dict(nudge_state, theme=theme)
         pg.evaluate("s => Ravi.update(s)", st)
         size = fit(pg, "nudge")
-        check(size is not None and size["w"] == 416, f"reports the nudge size for the window ({size})")
+        check(size is not None and size["w"] == 448, f"reports the nudge size for the window ({size})")
         check(pg.evaluate("document.body.classList.contains('win')"), "Windows look: the OS draws the corners")
         pg.wait_for_timeout(700)
         pg.screenshot(path=str(shots / f"{theme}-1-intro.png"))
@@ -104,6 +104,15 @@ with sync_playwright() as p:
         pg.screenshot(path=str(shots / f"{theme}-6-done.png"))
         pg.wait_for_timeout(4800)
         check(posted(pg, "closed") != [], "closes itself after done")
+
+        # every move draws: a nudge for each one, and nothing in the drawing is NaN or undefined
+        every = json.loads((shared / "moves.json").read_text())["moves"]
+        for i, m in enumerate(every):
+            pg.evaluate("s => Ravi.update(s)", dict(st, nudge=dict(st["nudge"], key=900 + i, move=m, intro=False, manual=True)))
+            pg.wait_for_timeout(60)
+            bad = pg.evaluate("[...document.querySelectorAll('#nArt svg *')].flatMap(e => [...e.attributes].filter(a => /NaN|undefined|Infinity/.test(a.value)).map(a => e.tagName + ' ' + a.name)).slice(0, 3)")
+            check(not bad, f"{m['id']} draws cleanly {bad}")
+        check(len(every) == 24, "all 24 moves were drawn")
 
         # home card
         pg.evaluate("s => Ravi.update(s)", dict(st, nudge=None, mode="none"))
