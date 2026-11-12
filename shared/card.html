@@ -16,7 +16,8 @@
   --bg:#E7ECE8; --surface:#FBFCFA; --sunk:#EFF3F0; --ink:#1A231F; --muted:#58665F; --line:#D0D9D3;
   --tomato:#CF3E27; --tomato-soft:#F7DDD5; --basil:#2C774A; --basil-soft:#D5EADC;
   --tile:#F5E8CB; --semolina:#F2C14B; --semolina-hi:#F8D97C; --crust:#C38A1E; --outline:#241F19;
-  --limb:#241F19; --chair:#A6B3AC; --meet:#7A6CF0;
+  --limb:#241F19; --chair:#A6B3AC; --meet:#7A6CF0; --sweat:#8FD0F2;
+  --prop:var(--chair); --ghost:var(--ink); --move:var(--tomato); --feel:var(--tomato); --casing:transparent;   /* the drawing's colours: props, the start-pose ghost, arrows, glows, arrow outlines */
   --shadow:0 1px 2px rgba(22,34,28,.10), 0 12px 22px -12px rgba(22,34,28,.50);
   --f-display:"Shrikhand","Georgia",serif;
   --f-body:"Figtree","Ubuntu",system-ui,sans-serif;
@@ -195,17 +196,18 @@ body.flat .pill{border-radius:4px}
 .f-cheek{fill:var(--tomato);opacity:.28}
 .f-tongue{fill:var(--tomato)}
 /* props: chairs, desks, doorways, windows */
-.r-prop{fill:none;stroke:var(--chair);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.r-prop{fill:none;stroke:var(--prop);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
 .r-prop .thin{stroke-width:2.2;stroke:var(--line)}
 .r-prop .fill{fill:var(--chair);stroke:none}
 .r-prop .soft{fill:var(--sunk);stroke:none}
 /* the ghost: where the move starts */
 .r-ghost{opacity:.26}
-.r-ghost .r-limb,.r-ghost .r-hand{stroke:var(--ink)}
-.r-ghost .r-cap,.r-ghost .r-shoe{fill:var(--ink)}
+.r-ghost .r-limb,.r-ghost .r-hand{stroke:var(--ghost)}
+.r-ghost .r-cap,.r-ghost .r-shoe{fill:var(--ghost)}
 /* cues: where it goes and where you feel it */
-.c-arrow,.c-head{fill:none;stroke:var(--tomato);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
-.c-zone{fill:var(--tomato);fill-opacity:.26;stroke:var(--tomato);stroke-opacity:.7;stroke-width:1.6;stroke-dasharray:3 3}
+.c-arrow,.c-head{fill:none;stroke:var(--move);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.c-casing{fill:none;stroke:var(--casing);stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.c-zone{fill:var(--feel);fill-opacity:.26;stroke:var(--feel);stroke-opacity:.7;stroke-width:1.6;stroke-dasharray:3 3}
 .c-ring{fill:var(--basil-soft);fill-opacity:.55;stroke:var(--basil);stroke-opacity:.55;stroke-width:2.5}
 .c-soft{fill:var(--tomato-soft);stroke:none}
 .c-line{fill:none;stroke:var(--tomato);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -216,6 +218,7 @@ body.flat .pill{border-radius:4px}
 .c-out{fill:none;stroke:var(--outline);stroke-linecap:round;stroke-linejoin:round}
 .c-fill{fill:none;stroke:var(--semolina);stroke-linecap:round;stroke-linejoin:round}
 .c-roll{fill:none;stroke:var(--tomato);stroke-opacity:.6;stroke-width:2.2;stroke-dasharray:2.5 3.5;stroke-linecap:round}
+.f-sweat{fill:var(--sweat);stroke:var(--outline);stroke-width:.9;opacity:0}
 
 @media (prefers-reduced-motion: reduce){
   .nudge.enter{animation:fade-in .2s ease both}
@@ -404,10 +407,14 @@ const FACES = {
      stretch snaps in and then stays, and a rep is quick up and slow down.
    - Arcs: hands and feet travel along arcs around their joint, not in straight lines.
    - Follow-through and overlapping action: the body leads, the arms lag a beat, the hands a beat more, the eyes lead.
-   - Secondary action: he breathes even while he holds a stretch, and he blinks.
+   - Secondary action: he breathes, sways, shifts his weight, glances around and fidgets all the time (see life()),
+     he trembles and sweats when he strains, and he blinks. Nothing on screen is ever frozen.
+   - Follow-through: a pose that arrives fast overshoots and wobbles for a moment (bounce), and a held stretch keeps
+     creeping deeper (creep), the way a real one does.
    - Exaggeration: the poses go further than a person would.
-   A pose is a loop of keys: { d: time to arrive, hold: time held there, ease, ...params }. Unset params carry on
-   from the key before; the last key eases back into the first. */
+   A pose is a loop of keys: { d: time to arrive, hold: time held there, ease, creep, bounce, ...params }. Unset
+   params carry on from the key before; the last key eases back into the first. creep is how far the numeric
+   params drift during the hold; bounce is how much of the last move overshoots and rings (a default comes from ease). */
 const SVGNS = "http://www.w3.org/2000/svg";
 const mk = (tag, parent, attrs) => {
   const e = document.createElementNS(SVGNS, tag);
@@ -473,6 +480,9 @@ function mixKeys(a, b, u){
 }
 
 const POSES = {};
+const BOUNCE = { snap:.2, in:.26, out:.1 };                       // how much an arrival rings, by how it eased in
+const SETTLE = ["dy", "sy", "sx", "rot", "fx", "fy", "fr"];        // the params that wobble after an arrival
+const addDelta = (key, d) => { const k = { ...key }; for (const n in d) k[n] = key[n] + d[n]; return k; };
 // resolve a pose: carry params forward through its keys and lay out the timeline
 function prepare(P){
   let prev = BASE, acc = 0;
@@ -480,9 +490,11 @@ function prepare(P){
     const key = { ...prev };
     for (const n in k) key[n] = k[n];
     key.d = k.d ?? 1; key.hold = k.hold ?? 0; key.ease = k.ease || "io";
+    key.creep = k.creep; key.bounce = k.bounce ?? BOUNCE[key.ease] ?? 0;
     prev = key;
     return key;
   });
+  P._K.forEach(k => { k._end = k.creep ? addDelta(k, k.creep) : k; });   // where a held key has crept to by the end of its hold
   P._seg = P._K.map(k => { const s = { t0:acc, t1:acc + k.d, t2:acc + k.d + k.hold }; acc = s.t2; return s; });
   P._total = acc;
   if (P.peak == null) P.peak = Math.min(1, P._K.length - 1);
@@ -496,9 +508,20 @@ function at(P, f){
   for (let i = 0; i < n; i++){
     const s = P._seg[i];
     if (T < s.t2 || i === n - 1){
-      const to = P._K[i];
-      if (T >= s.t1) return to;
-      return mixKeys(P._K[(i + n - 1) % n], to, EASE[to.ease]((T - s.t0) / (s.t1 - s.t0)));
+      const to = P._K[i], from = P._K[(i + n - 1) % n]._end;
+      if (T < s.t1) return mixKeys(from, to, EASE[to.ease]((T - s.t0) / (s.t1 - s.t0)));
+      // holding: creep deeper into the pose, and let the momentum of the arrival ring for a moment
+      const h = s.t2 > s.t1 ? (T - s.t1) / (s.t2 - s.t1) : 1;
+      let X = to._end === to ? to : mixKeys(to, to._end, EASE.out(h));
+      if (to.bounce){
+        const sec = (T - s.t1) * P.p / P._total, w = Math.exp(-4.2 * sec) * Math.sin(2 * Math.PI * 3 * sec) * to.bounce * (1 - h * h);
+        if (Math.abs(w) > .002){
+          X = { ...X };
+          for (const k of SETTLE) X[k] += (to[k] - from[k]) * w;
+          for (const k of ["armL", "armR"]) X[k] = X[k].map((p, j) => p.map((v, m) => v + (to[k][j][m] - from[k][j][m]) * w * 1.6));   // hands ring more than the body
+        }
+      }
+      return X;
     }
   }
 }
@@ -524,6 +547,7 @@ function buildFigure(parent, withFace){
   mk("path", f.head, { class:"r-pillow", d:PILLOW });
   if (withFace){
     mk("ellipse", f.head, { class:"r-shine", cx:73, cy:63, rx:11, ry:6, transform:"rotate(-28 73 63)" });
+    f.sweat = mk("path", f.head, { class:"f-sweat", d:"M0 -5 Q3.8 .6 0 4.2 Q-3.8 .6 0 -5Z" });
     f.face = mk("g", f.head, { class:"r-face" });
     f.face.innerHTML = '<circle class="f-cheek" cx="66.5" cy="91" r="5.2"/><circle class="f-cheek" cx="113.5" cy="91" r="5.2"/><g class="r-eyes"></g><g class="r-mouth"></g>';
     f.eyes = f.face.querySelector(".r-eyes"); f.mouth = f.face.querySelector(".r-mouth");
@@ -540,8 +564,7 @@ function buildFigure(parent, withFace){
 function applyFigure(f, X, P, o){
   const tt = Math.abs(X.turn), side = X.turn >= 0 ? 1 : -1;
   const near = tt > .35 ? (X.turn > 0 ? 1 : 0) : -1;           // which side faces us in a profile (0 = L, 1 = R)
-  const br = o.anim && !P.still ? Math.sin(o.now / 3600 * 2 * Math.PI) * .012 : 0;   // a held pose still breathes
-  const sx = X.sx * (1 - .2 * tt) * (1 - br * .5), sy = X.sy * (1 + br);
+  const sx = X.sx * (1 - .2 * tt), sy = X.sy;
   const [px, py] = RIG.pivot, a = X.rot * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a);
   const body = p => { const x = (p[0] - px) * sx, y = (p[1] - py) * sy; return [px + X.dx + x*cs - y*sn, py + X.dy + x*sn + y*cs]; };
   const bodyT = `translate(${X.dx.toFixed(2)} ${X.dy.toFixed(2)}) rotate(${X.rot.toFixed(2)} ${px} ${py}) translate(${px} ${py}) scale(${sx.toFixed(3)} ${sy.toFixed(3)}) translate(${-px} ${-py})`;
@@ -586,9 +609,11 @@ function applyFigure(f, X, P, o){
 const CUES = {
   // an arrow that draws itself along the path while its window is open
   arrow(inst, c){
-    const g = mk("g", inst.cueG), path = mk("path", g, { class:"c-arrow", d:c.d, pathLength:100 });
+    const g = mk("g", inst.cueG);
+    const casing = mk("path", g, { class:"c-casing", d:c.d, pathLength:100 }), headCasing = mk("path", g, { class:"c-casing", d:"M-5 -4.2 L3 0 L-5 4.2" });   // the outline under the arrow
+    const path = mk("path", g, { class:"c-arrow", d:c.d, pathLength:100 });
     const head = mk("path", g, { class:"c-head", d:"M-5 -4.2 L3 0 L-5 4.2" });
-    path.setAttribute("stroke-dasharray", "100");
+    path.setAttribute("stroke-dasharray", "100"); casing.setAttribute("stroke-dasharray", "100");
     let L = 0;
     return (f, X, o) => {
       const a = o.anim ? win(f, c._win) : 1;
@@ -600,9 +625,11 @@ const CUES = {
         const g0 = f < c._win[0] ? f + 1 : f;
         q = EASE.out(clamp01((g0 - c._win[0]) / ((c._win[1] - c._win[0]) * (c.draw ?? .45))));
       }
-      path.setAttribute("stroke-dashoffset", (100 * (1 - q)).toFixed(1));
+      path.setAttribute("stroke-dashoffset", (100 * (1 - q)).toFixed(1)); casing.setAttribute("stroke-dashoffset", (100 * (1 - q)).toFixed(1));
       const p1 = path.getPointAtLength(L * q), p0 = path.getPointAtLength(Math.max(0, L * q - 3));
-      head.setAttribute("transform", `translate(${p1.x.toFixed(1)} ${p1.y.toFixed(1)}) rotate(${(Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI).toFixed(1)})`);
+      const len = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1, bob = o.anim && q >= 1 ? 2.6 * Math.sin(o.now / 1000 * 2 * Math.PI * 1.5) : 0;   // the head nudges along, saying "this way"
+      const ht = `translate(${(p1.x + (p1.x - p0.x) / len * bob).toFixed(1)} ${(p1.y + (p1.y - p0.y) / len * bob).toFixed(1)}) rotate(${(Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI).toFixed(1)})`;
+      head.setAttribute("transform", ht); headCasing.setAttribute("transform", ht);
       g.style.opacity = a;
       if (c.follow) g.setAttribute("transform", o.bodyT);
     };
@@ -610,13 +637,14 @@ const CUES = {
   // a soft pulsing glow where you should feel it
   zone(inst, c){
     const g = mk("g", c.layer === "back" ? inst.back : inst.cueG);
-    mk("ellipse", g, { class:"c-zone", cx:c.x, cy:c.y, rx:c.rx, ry:c.ry, transform:c.rot ? `rotate(${c.rot} ${c.x} ${c.y})` : "" });
+    const e = mk("ellipse", g, { class:"c-zone", cx:c.x, cy:c.y, rx:c.rx, ry:c.ry, transform:c.rot ? `rotate(${c.rot} ${c.x} ${c.y})` : "" });
     return (f, X, o) => {
       const a = o.anim ? win(f, c._win) : 1;
       g.style.display = a > 0 ? "" : "none";
       if (a <= 0) return;
-      const pulse = o.anim ? .5 + .5 * Math.sin(o.now / 1000 * 2 * Math.PI / (c.period ?? 1.6)) : .5;
-      g.style.opacity = a * (.55 + .45 * pulse);
+      const pulse = o.anim ? .5 + .5 * Math.sin(o.now / 1000 * 2 * Math.PI / (c.period ?? 1.4)) : .5;
+      e.setAttribute("rx", (c.rx * (.9 + .2 * pulse)).toFixed(2)); e.setAttribute("ry", (c.ry * (.92 + .16 * pulse)).toFixed(2));
+      g.style.opacity = a * (.5 + .5 * pulse);
       if (c.follow) g.setAttribute("transform", o.bodyT);
     };
   },
@@ -678,6 +706,22 @@ function setPose(inst, pose, { animate = true } = {}){
   if (animate) live.add(inst); else live.delete(inst);
   drawRavi(inst, performance.now(), animate ? null : 0.85);
 }
+// ---- life: the little movements that never stop, on top of whatever the pose says
+const hash = n => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+const smooth = u => u * u * (3 - 2 * u);
+function life(X, t, P){
+  const a = P.life ?? 1;
+  // the eyes jump from one spot to the next every second or two
+  const dart = (period, k) => { const i = Math.floor(t / period); return lerp(hash((i - 1) * 7 + k) - .5, hash(i * 7 + k) - .5, smooth(clamp01((t / period - i) * period / .16))); };
+  X.rot += a * (1.8 * Math.sin(t * 1.46) + .8 * Math.sin(t * 2.31 + 1.3));    // swaying, shifting weight from foot to foot
+  X.dx += a * 1.2 * Math.sin(t * 1.17 + .4);
+  X.dy += a * .9 * Math.sin(t * 1.75 + .6);
+  X.sy *= 1 + a * .03 * Math.sin(t * 1.75 + .6); X.sx *= 1 - a * .014 * Math.sin(t * 1.75 + .6);   // breathing
+  X.fr += a * 2.4 * Math.sin(t * 2.0 + .7); X.fx += a * 1.1 * Math.sin(t * 1.7); X.fy += a * .8 * Math.sin(t * 2.5 + 2);   // the head drifts on the body
+  X.ex += a * 2.5 * dart(2.3, 1); X.ey += a * 1.5 * dart(1.7, 2);              // glances
+  X.wristL += a * 8 * Math.sin(t * 2.2); X.wristR += a * 8 * Math.sin(t * 2.7 + 1);   // fidgeting hands
+  if (X.face === "effort" || X.face === "tuck"){ X.dx += .45 * Math.sin(t * 61); X.rot += .4 * Math.sin(t * 47 + 1); }   // strain shows as a tremble
+}
 const DEFAULT_LAG = { arm:.07, hand:.13, face:.05, eye:.1 };   // seconds: arms and hands trail the body, the face and eyes lead it
 function drawRavi(inst, now, fixedK){
   const P = POSES[inst.pose];
@@ -690,8 +734,9 @@ function drawRavi(inst, now, fixedK){
     const Xb = at(P, f), Xa = at(P, f - lag("arm")), Xh = at(P, f - lag("hand")), Xf = at(P, f + lag("face")), Xe = at(P, f + lag("eye"));
     X = { ...Xb, armL:Xa.armL, armR:Xa.armR, shL:Xa.shL, shR:Xa.shR, handL:Xh.handL, handR:Xh.handR, wristL:Xh.wristL, wristR:Xh.wristR,
       face:Xf.face, fx:Xf.fx, fy:Xf.fy, fr:Xf.fr, ex:Xe.ex, ey:Xe.ey };
+    if (!P.still) life(X, now / 1000 + inst.seed / 1000, P);
   } else {
-    X = P._K[P.peak]; f = P._seg[P.peak].t1 / P._total;
+    X = P._K[P.peak]._end; f = P._seg[P.peak].t1 / P._total;
   }
   if (inst.mirror !== inst.mirrored){ inst.mirrored = inst.mirror; inst.rig.setAttribute("transform", inst.mirror ? "matrix(-1 0 0 1 180 0)" : ""); }
   const bodyT = applyFigure(inst.fig, X, P, { now, anim });
@@ -699,11 +744,17 @@ function drawRavi(inst, now, fixedK){
   inst.shadow.setAttribute("rx", (44 - lift * .8 + sink * .25).toFixed(1));
   inst.shadow.style.opacity = Math.max(.04, .1 - lift * .004);
   const F = FACES[X.face];
-  const blinking = F.blink && anim && ((now + inst.seed) % 4300) < 140;
+  const blinking = F.blink && anim && (((now + inst.seed) % 3700) < 130 || ((now + inst.seed * 2) % 5300) < 130);   // two rhythms, so now and then he double-blinks
   const fk = X.face + (blinking ? "-b" : "");
   if (fk !== inst.faceKey){ inst.faceKey = fk; inst.fig.eyes.innerHTML = blinking ? EYES_SHUT : F.eyes; inst.fig.mouth.innerHTML = F.mouth; }
   const ek = X.ex.toFixed(1) + "," + X.ey.toFixed(1);
   if (ek !== inst.eyeKey){ inst.eyeKey = ek; inst.fig.eyes.setAttribute("transform", `translate(${ek.replace(",", " ")})`); }
+  const sw = inst.fig.sweat, strain = anim && (X.face === "effort" || X.face === "tuck");   // a sweat drop slides down the temple
+  if (sw){
+    const c = ((now / 1000 + inst.seed / 1000) % 1.9) / 1.9;
+    sw.setAttribute("transform", `translate(114 ${(56 + c * 24).toFixed(1)}) scale(${(.8 + .3 * c).toFixed(2)})`);
+    sw.style.opacity = strain ? Math.sin(Math.PI * c) * .95 : 0;
+  }
   const o = { now, anim, bodyT };
   for (const u of inst.cues) u(f, X, o);
 }
@@ -997,7 +1048,7 @@ POSES.hamstring = { p:6.6, peak:1, ghost:0, back:["chairP", "floor"],
     { type:"arrow", d:"M84 60 Q110 62 128 86", at:[1, 1], draw:.4 }] };
 
 // Sit-to-stands, in profile: wind up (squash), lean over the toes, stand tall (stretch, overshoot), sit down slowly.
-POSES.sitstand = { p:6.2, peak:3, ghost:0, back:["chairP", "floor"],
+POSES.sitstand = { p:6.6, peak:3, ghost:0, back:["chairP", "floor"],
   keys:[
     { ...SIT_P, ...LAP, face:"smile", d:.5, hold:.5 },
     { rot:5, dy:25, sy:.95, sx:1.04, armR:[[146,112],[142,124]], armL:[[34,112],[38,124]], face:"effort", d:.45 },
@@ -1005,7 +1056,7 @@ POSES.sitstand = { p:6.2, peak:3, ghost:0, back:["chairP", "floor"],
     { rot:0, dy:0, sy:1.1, sx:.95, ...arms([[39,112],[34,138]]), face:"grin", ey:0, fy:0, d:.5, ease:"back", hold:.5 },
     { sy:1, sx:1, d:.3 },
     { rot:12, dy:10, sy:.98, armR:[[156,100],[170,100]], armL:[[76,100],[96,100]], face:"effort", d:1.1 },
-    { rot:2, dy:26, sy:.9, sx:1.07, ...LAP, d:.45, ease:"in" }],
+    { rot:2, dy:26, sy:.9, sx:1.07, ...LAP, d:.45, ease:"in", hold:.35 }],
   cues:[
     { type:"arrow", d:"M136 150 Q150 118 134 82", at:[2, 3], draw:.5 }] };
 
@@ -1040,7 +1091,7 @@ POSES.brugger = { p:7, peak:1, back:["chairF"],
     { type:"arrow", d:"M140 100 Q154 112 156 134", at:[1, 1], draw:.4 }] };
 
 // Belly breathing: he inflates for 4, deflates for 6, and a ring behind him breathes with him.
-POSES.breathe = { p:10, peak:1, back:["floor"], still:true,
+POSES.breathe = { p:10, peak:1, back:["floor"], life:.35,
   keys:[
     { ...arms([[44,112],[74,112]]), handL:6, handR:6, wristL:30, wristR:30, face:"rest", aux:0, d:6, hold:.4 },
     { sx:1.09, sy:1.05, dy:-1, aux:1, d:3.6, hold:.4 }],
@@ -1056,6 +1107,15 @@ POSES.ankles = { p:2.4, peak:1, back:["chairP", "floor"], fit:{ s:.8, x:-16, y:1
     return (f, X) => upd(X.aux * 36);
   } }] };
 
+// held stretches never freeze: during its hold, key n of a pose keeps drifting deeper by these amounts (creep)
+const DEEPEN = {
+  tuck:{ 2:{ fx:-3.5, fy:.8 } }, arch:{ 2:{ rot:-3, ey:-1 } }, squeeze:{ 1:{ sy:.025, fy:-1 } }, doorway:{ 1:{ dx:-4, turn:-.12 } },
+  tilt:{ 1:{ fr:-5, fx:-1.5, rot:-2 } }, reach:{ 2:{ sy:.03 }, 3:{ rot:3 }, 4:{ rot:-3 } }, twist:{ 1:{ turn:.08 }, 3:{ turn:-.08 } },
+  wrist:{ 1:{ aux:.1 }, 2:{ aux:-.1 } }, gaze:{ 1:{ ex:1.5, turn:.06 } }, lunge:{ 2:{ dy:3, dx:1.5 } }, angel:{ 2:{ sy:.02 } },
+  levator:{ 1:{ fr:5, fy:1.5 } }, catcow:{ 1:{ fr:4, fy:2 }, 2:{ fr:-4, fy:-1.5 } }, figure4:{ 1:{ dy:2, fy:2 } },
+  hamstring:{ 1:{ rot:3 } }, brugger:{ 1:{ sy:.02, fy:-1.5 } }, calf:{ 2:{ dy:-1.5 } }, sitstand:{ 3:{ sy:.02 } },
+};
+for (const name in DEEPEN) for (const i in DEEPEN[name]) POSES[name].keys[i].creep = DEEPEN[name][i];
 for (const P of Object.values(POSES)) prepare(P);
 (function frame(now){
   for (const inst of live) drawRavi(inst, now);

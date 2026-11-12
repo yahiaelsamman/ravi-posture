@@ -62,12 +62,19 @@ fixed length solved with two-bone IK, so limbs bend at the elbow and knee. On to
   snaps in and then stays, and a rep is quick up and slow down.
 - **Arcs, follow-through and overlap.** Hands and feet travel along arcs, the arms trail the body by a beat and the hands
   by another, and the face and eyes lead.
-- **Secondary action.** He keeps breathing while he holds a stretch, and blinks.
+- **Secondary action.** Nothing on screen is ever frozen: he breathes, sways, shifts his weight, glances around, fidgets
+  his hands and lets his head drift, he blinks (sometimes twice), and when he strains he trembles and sweats.
+- **Follow-through.** A pose that arrives fast overshoots and rings for a moment (`bounce`), the hands more than the
+  body, and a held stretch keeps creeping deeper (`creep`), the way a real one does.
 - **Exaggeration.** Poses go further than a person would, because small movements vanish at this size.
 
 With "reduce motion" on, he doesn't move: the card shows the peak of the move with its ghost, arrow and glow.
 
 To add a move: add it to `moves.json` with a `pose` name, then add that pose to `POSES` in `card.html`. A pose is a
-loop of keys (`{ d: time to arrive, hold: time held, ease, ...params }`) plus optional `back`/`over` props, a `ghost`,
+loop of keys (`{ d: time to arrive, hold: time held, ease, creep, bounce, ...params }`) plus optional `back`/`over` props, a `ghost`,
 `cues` (arrows, glows, a breathing ring, or your own drawing) and a `fit` if it needs a magnifier. Unset params carry on
 from the key before.
+
+The drawing's colours are tokens at the top of `card.html` (`--prop` for props, `--ghost` for the start-pose ghost,
+`--move` for arrows, `--feel` for the glow where you feel a stretch, `--casing` for the outline under arrows,
+`--sweat`), so a palette change is a few values, not a hunt through the drawing code.
