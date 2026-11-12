@@ -135,4 +135,11 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" Ravi-macos.zip Ravi-windows.zip Ravi-linux.tar.gz --repo "$GITHUB_REPOSITORY" --title "Ravi $GITHUB_REF_NAME" --generate-notes
+        run: |
+          files="Ravi-macos.zip Ravi-windows.zip Ravi-linux.tar.gz"
+          # A release made by hand in the web UI already exists for the tag: attach to it instead of failing.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" $files --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" $files --repo "$GITHUB_REPOSITORY" --title "Ravi $GITHUB_REF_NAME" --generate-notes
+          fi

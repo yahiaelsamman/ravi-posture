@@ -7,6 +7,12 @@ screen with a quick desk stretch: chin tucks, a doorway chest stretch, a lap aro
 Ravi times your reps; snooze it and he's back in five minutes, slightly offended. A daily tally and the
 last seven days sit one shortcut away.
 
+<p align="center">
+  <a href="https://github.com/yahiaelsamman/ravi-posture/releases/latest/download/Ravi-windows.zip"><img src="https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Download for Windows"></a>
+  <a href="https://github.com/yahiaelsamman/ravi-posture/releases/latest/download/Ravi-macos.zip"><img src="https://img.shields.io/badge/Download-macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS"></a>
+  <a href="https://github.com/yahiaelsamman/ravi-posture/releases/latest/download/Ravi-linux.tar.gz"><img src="https://img.shields.io/badge/Download-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Download for Linux"></a>
+</p>
+
 ![Ravi on Ubuntu: the nudge, the rep timer, done, the home card and the pill](docs/linux-desktop.png)
 
 - **Never steals your typing.** The card appears without taking the keyboard. Ctrl+Alt+R (⌃⌥R on a Mac)
@@ -25,18 +31,15 @@ last seven days sit one shortcut away.
 
 ## Install
 
-Ready-made packages are on the [Releases](https://github.com/yahiaelsamman/ravi-posture/releases) page.
+Use the download buttons above (not "Source code" on the Releases page, which has no app in it).
 
-| | How | Details |
-| --- | --- | --- |
-| **macOS 13+** | `bash macos/build.sh` (builds and installs), or `Ravi-macos.zip` from Releases | [macos/](macos/README.md) |
-| **Windows 10/11** | `Ravi-windows.zip` from Releases: unzip, double-click `install.cmd` | [windows/](windows/README.md) |
-| **Linux** (Ubuntu/GNOME) | `bash linux/install.sh` | [linux/](linux/README.md) |
+- **Windows 10/11:** unzip `Ravi-windows.zip` and double-click `install.cmd`. No admin needed. Because the app
+  isn't code-signed, SmartScreen may say "Windows protected your PC": choose **More info → Run anyway**.
+- **macOS 13+:** unzip `Ravi-macos.zip` and move `Ravi.app` to Applications. It isn't notarized, so the first
+  time macOS blocks it: open **System Settings → Privacy & Security** and choose **Open Anyway**.
+- **Linux (Ubuntu/GNOME):** extract `Ravi-linux.tar.gz` (`tar xzf Ravi-linux.tar.gz`) and run `bash ravi-posture/linux/install.sh`.
 
-```bash
-git clone https://github.com/yahiaelsamman/ravi-posture.git
-cd ravi-posture
-```
+More detail: [macOS](macos/README.md) · [Windows](windows/README.md) · [Linux](linux/README.md).
 
 ## How it's built
 
@@ -54,11 +57,16 @@ macos/      Swift + AppKit + WKWebView: menu-bar item, Carbon hot key, SMAppServ
 
 To change a move or one of Ravi's lines, edit `shared/moves.json` and reinstall.
 
-### Building
+### Build from source
 
-- **macOS:** `macos/build.sh` compiles with `swiftc` (Xcode Command Line Tools).
+```bash
+git clone https://github.com/yahiaelsamman/ravi-posture.git
+cd ravi-posture
+```
+
+- **macOS:** `bash macos/build.sh` compiles with `swiftc` (Xcode Command Line Tools) and installs Ravi.app.
 - **Windows:** `cd windows && dotnet build -c Release` (works on Windows, Linux or macOS with the .NET SDK).
-- **Linux:** nothing to build; `linux/install.sh` installs the Python app and its dependencies.
+- **Linux:** nothing to build; `bash linux/install.sh` installs the Python app and its dependencies.
 
 GitHub Actions builds and tests all three on their own operating systems for every push
 ([`.github/workflows/build.yml`](.github/workflows/build.yml)). Pushing a tag such as `v1.0.0` publishes the
