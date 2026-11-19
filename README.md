@@ -62,8 +62,9 @@ To change a move or one of Ravi's lines, edit `shared/moves.json` and reinstall.
 - **Linux:** nothing to build; `linux/install.sh` installs the Python app and its dependencies.
 
 GitHub Actions builds and tests all three on their own operating systems for every push
-([`.github/workflows/build.yml`](.github/workflows/build.yml)). Pushing a tag such as `v1.0.0` publishes the
-packages as a release.
+([`.github/workflows/build.yml`](.github/workflows/build.yml)). To publish a release, open Actions > Build >
+Run workflow on `main` and type a version such as `v1.1.0` (or push that tag): once all three builds pass, the
+packages are published as a release.
 
 ### Tests
 

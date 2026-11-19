@@ -1,5 +1,6 @@
-# Builds and tests every version on its own OS. Each run keeps the packages as downloadable artifacts;
-# pushing a tag like v1.0.0 also publishes them as a GitHub release.
+# Builds and tests every version on its own OS. Each run keeps the packages as downloadable artifacts.
+# To publish a release, either push a tag like v1.1.0, or open Actions > Build > Run workflow on main and type
+# the version: the release job then creates the tag itself once all three builds pass.
 name: Build
 
 on:
@@ -8,6 +9,11 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Publish a release with this version, for example v1.1.0 (only from main). Leave empty to just build and test."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -124,7 +130,7 @@ jobs:
           path: Ravi-linux.tar.gz
 
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.version != '' && github.ref == 'refs/heads/main')
     needs: [macos, windows, linux]
     runs-on: ubuntu-latest
     steps:
@@ -135,4 +141,10 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" Ravi-macos.zip Ravi-windows.zip Ravi-linux.tar.gz --repo "$GITHUB_REPOSITORY" --title "Ravi $GITHUB_REF_NAME" --generate-notes
+          VERSION: ${{ inputs.version || github.ref_name }}   # via env, never pasted into the script
+        run: |
+          if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "The version must look like v1.2.3, not: $VERSION"; exit 1
+          fi
+          # for a tag push the tag exists already; from the Actions tab gh creates it on the commit that was built
+          gh release create "$VERSION" Ravi-macos.zip Ravi-windows.zip Ravi-linux.tar.gz --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Ravi $VERSION" --generate-notes
