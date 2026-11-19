@@ -71,27 +71,27 @@ kbd{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:
 .eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 /* ---------- nudge (the web Ravi's notification, now a real window) */
-.nudge{width:448px;padding:14px;position:relative;transform-origin:top right}
+.nudge{width:392px;padding:12px;position:relative;transform-origin:top right}
 .nudge.enter{animation:nudge-in .6s cubic-bezier(.18,1.35,.4,1) both}
 @keyframes nudge-in{from{transform:translate(26px,-6px) scale(.94);opacity:0}}
 .nudge.leave{animation:nudge-out .24s ease-in both}
 @keyframes nudge-out{to{transform:translateX(26px);opacity:0}}
 .n-ctrls{position:absolute;top:8px;right:8px;display:flex;gap:2px;z-index:2}
-.n-grid{display:grid;grid-template-columns:124px minmax(0,1fr);gap:14px;align-items:start}
-.n-art{width:124px;height:136px;border-radius:16px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
-.n-art svg{width:122px;height:136px}
+.n-grid{display:grid;grid-template-columns:108px minmax(0,1fr);gap:12px;align-items:start}
+.n-art{width:108px;height:120px;border-radius:14px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
+.n-art svg{width:106px;height:118px}
 .n-main{display:grid;gap:6px;min-width:0}
-.n-intro{display:grid;align-content:center;justify-items:start;min-height:136px;padding:0 60px 0 0;border:0;background:none;text-align:left;cursor:pointer;border-radius:12px}
+.n-intro{display:grid;align-content:center;justify-items:start;min-height:120px;padding:0 56px 0 0;border:0;background:none;text-align:left;cursor:pointer;border-radius:12px}
 .n-intro small{font-size:14px;color:var(--muted);font-weight:600}
-.n-intro strong{font-family:var(--f-display);font-weight:400;font-size:38px;line-height:1.05;color:var(--tomato)}
-.n-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-right:62px}
-.n-head h3{font-size:17px;font-weight:750;line-height:1.2}
-.n-meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-.n-desc{font-size:14px;color:var(--muted);line-height:1.4}
-.n-dose{font-family:var(--f-mono);font-size:13px;color:var(--tomato);font-weight:500}
+.n-intro strong{font-family:var(--f-display);font-weight:400;font-size:34px;line-height:1.05;color:var(--tomato)}
+.n-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-right:58px}
+.n-head h3{font-size:16px;font-weight:750;line-height:1.2}
+.n-meta{display:none}   /* the clock time of the nudge added nothing and made long titles wrap */
+.n-desc{font-size:13px;color:var(--muted);line-height:1.38}
+.n-dose{font-family:var(--f-mono);font-size:12.5px;color:var(--tomato);font-weight:500}
 .n-actions{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:2px}
-.n-actions .btn{padding:7px 12px}
-.n-actions .btn-text{padding:6px 6px}
+.n-actions .btn{padding:5px 11px;font-size:13px}
+.n-actions .btn-text{padding:5px 5px}
 .n-actions .spacer{flex:1}
 .howto-btn svg{width:13px;height:13px;transition:transform .2s}
 .howto-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
@@ -100,9 +100,18 @@ kbd{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:
 .n-timer{display:grid;gap:6px}
 .n-track{height:6px;border-radius:6px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
 .n-track i{display:block;height:100%;width:0;background:var(--tomato);border-radius:6px}
-.n-cue{display:flex;justify-content:space-between;align-items:baseline;font-weight:650;font-size:14.5px}
+.n-cue{display:flex;justify-content:space-between;align-items:baseline;font-weight:650;font-size:14px}
 .n-cue span:last-child{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
-.n-done{display:flex;align-items:center;gap:8px;font-weight:650;background:var(--basil-soft);border-radius:12px;padding:8px 12px;font-size:14.5px}
+.n-done{display:flex;align-items:center;gap:8px;font-weight:650;background:var(--basil-soft);border-radius:12px;padding:7px 12px;font-size:14px}
+/* after a stretch the card shrinks to a slim toast instead of staying full size */
+.nudge.done{width:auto;padding:8px 44px 8px 8px}
+.nudge.done .n-grid{grid-template-columns:48px auto;gap:10px;align-items:center}
+.nudge.done .n-art{width:48px;height:48px;border-radius:50%}
+.nudge.done .n-art svg{width:44px;height:48px;margin-top:6px}
+.nudge.done .n-head,.nudge.done #nMin,.nudge.done .keys{display:none}
+.nudge.done .n-main{gap:0}
+.nudge.done .n-done{background:none;padding:0;white-space:nowrap}
+.nudge.done .n-ctrls{top:50%;transform:translateY(-50%)}
 .n-done svg{width:20px;height:20px;flex:none;color:var(--basil)}
 
 /* ---------- pill (minimized nudge) */
@@ -1204,6 +1213,7 @@ function setPhase(phase){
   els.nFinished.hidden = phase !== "done";
   els.nDesc.hidden = els.nDose.hidden = phase === "done";
   if (phase === "done") els.nHow.hidden = true;
+  els.nudge.classList.toggle("done", phase === "done");
   cardRavi.mirror = pillRavi.mirror = false;
   setPose(cardRavi, phase === "intro" ? "wave" : phase === "done" ? "cheer" : N.move.pose, { animate:S.mode === "nudge" });
   if (phase === "active"){ N.startedAt = Date.now(); updateActive(); N.tick = setInterval(updateActive, 250); }
@@ -1234,7 +1244,7 @@ function finish(){
   setPhase("done");
   chime("done");
   post("finish");
-  N.timers.push(setTimeout(() => leave("closed"), 4500));
+  N.timers.push(setTimeout(() => leave("closed"), 2400));
 }
 function leave(t, data){
   if (N.leaving || !N.key) return;
@@ -1346,7 +1356,9 @@ const K = (keys, label) => `<span>${keys.map(k => `<kbd>${k}</kbd>`).join("")}&n
 let GRAB = K(["Ctrl","Alt","R"], "to use the keyboard");
 let GRAB_KEYS = ["Ctrl","Alt","R"];
 function renderKeys(){
-  if (!S.focused){ els.nKeys.innerHTML = GRAB; els.hKeys.innerHTML = GRAB; return; }
+  els.nKeys.hidden = !S.focused;   // no always-on hint row eating space; it appears while you use the keyboard
+  els.nudge.title = S.focused ? "" : `${GRAB_KEYS.join("+")} to use the keyboard`;
+  if (!S.focused){ els.hKeys.innerHTML = GRAB; return; }
   const p = N.phase;
   els.nKeys.innerHTML =
     p === "intro" ? K(["Enter"], "show me") + K(["M"], "later") :

@@ -60,7 +60,7 @@ with sync_playwright() as p:
         st = dict(nudge_state, theme=theme)
         pg.evaluate("s => Ravi.update(s)", st)
         size = fit(pg, "nudge")
-        check(size is not None and size["w"] == 448, f"reports the nudge size for the window ({size})")
+        check(size is not None and size["w"] == 392, f"reports the nudge size for the window ({size})")
         check(pg.evaluate("document.body.classList.contains('win')"), "Windows look: the OS draws the corners")
         pg.wait_for_timeout(700)
         pg.screenshot(path=str(shots / f"{theme}-1-intro.png"))
@@ -100,9 +100,10 @@ with sync_playwright() as p:
         pg.keyboard.press("d")
         check(posted(pg, "finish") != [], "D finishes")
         pg.wait_for_timeout(300)
-        fit(pg, "nudge")
+        done = fit(pg, "nudge")
+        check(done is not None and done["w"] < 300 and done["h"] < 80, f"done shrinks to a slim toast ({done})")
         pg.screenshot(path=str(shots / f"{theme}-6-done.png"))
-        pg.wait_for_timeout(4800)
+        pg.wait_for_timeout(2600)
         check(posted(pg, "closed") != [], "closes itself after done")
 
         # every move draws: a nudge for each one, and nothing in the drawing is NaN or undefined
